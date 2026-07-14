@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 420" width="480" height="420" role="img" aria-label="A quiet morning at home — sunrise through an arched window, with a warm cup of tea on the sill.">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f4d9cc"/>
+      <stop offset="45%" stop-color="#f0e3c2"/>
+      <stop offset="100%" stop-color="#e3ead8"/>
+    </linearGradient>
+    <clipPath id="arch">
+      <path d="M70 250 V150 a170 170 0 0 1 340 0 V250 Z"/>
+    </clipPath>
+    <style>
+      @media (prefers-reduced-motion: no-preference) {
+        .steam1, .steam2 { animation: rise 4.5s ease-in-out infinite; }
+        .steam2 { animation-delay: -2.25s; }
+        @keyframes rise {
+          0%   { opacity: 0;    transform: translateY(6px); }
+          25%  { opacity: 0.75; }
+          100% { opacity: 0;    transform: translateY(-12px); }
+        }
+        .rays { animation: glow 6s ease-in-out infinite; }
+        @keyframes glow { 0%,100% { opacity: 0.4; } 50% { opacity: 0.75; } }
+      }
+    </style>
+  </defs>
+
+  <!-- window frame backing -->
+  <path d="M58 262 V150 a182 182 0 0 1 364 0 V262 Z" fill="#fbf7ee"/>
+
+  <!-- sky -->
+  <g clip-path="url(#arch)">
+    <rect x="70" y="-40" width="340" height="320" fill="url(#sky)"/>
+    <!-- sun -->
+    <circle cx="240" cy="232" r="60" fill="#d97757" opacity="0.9"/>
+    <circle cx="240" cy="232" r="60" fill="none" stroke="#c89a3a" stroke-width="0" />
+    <!-- sun rays -->
+    <g class="rays" stroke="#c89a3a" stroke-width="3" stroke-linecap="round" opacity="0.55">
+      <line x1="240" y1="140" x2="240" y2="120"/>
+      <line x1="180" y1="160" x2="168" y2="146"/>
+      <line x1="300" y1="160" x2="312" y2="146"/>
+      <line x1="150" y1="212" x2="132" y2="206"/>
+      <line x1="330" y1="212" x2="348" y2="206"/>
+    </g>
+    <!-- soft hills -->
+    <path d="M70 250 q60 -34 130 -14 q70 22 210 -6 V262 H70 Z" fill="#7c9879" opacity="0.55"/>
+    <path d="M70 258 q90 -22 180 -6 q90 16 160 -2 V262 H70 Z" fill="#234534" opacity="0.5"/>
+  </g>
+
+  <!-- arch frame stroke + mullions -->
+  <path d="M70 250 V150 a170 170 0 0 1 340 0 V250" fill="none" stroke="#1a3225" stroke-width="6"/>
+  <line x1="240" y1="20" x2="240" y2="250" stroke="#1a3225" stroke-width="5"/>
+  <line x1="72" y1="150" x2="408" y2="150" stroke="#1a3225" stroke-width="5"/>
+
+  <!-- windowsill -->
+  <rect x="44" y="250" width="392" height="18" rx="6" fill="#1a3225"/>
+  <rect x="52" y="268" width="376" height="10" rx="5" fill="#234534" opacity="0.5"/>
+
+  <!-- mug of tea -->
+  <g>
+    <path d="M300 300 h44 a6 6 0 0 1 6 6 v34 a22 22 0 0 1 -22 22 h-12 a22 22 0 0 1 -22 -22 v-34 a6 6 0 0 1 6 -6 Z" fill="#1a3225"/>
+    <path d="M350 312 h10 a14 14 0 0 1 0 28 h-10" fill="none" stroke="#1a3225" stroke-width="7"/>
+    <ellipse cx="322" cy="304" rx="26" ry="6" fill="#7c9879"/>
+    <!-- steam -->
+    <g fill="none" stroke="#989a8c" stroke-width="3.5" stroke-linecap="round" opacity="0.75" style="transform-box:fill-box">
+      <path class="steam1" d="M312 292 q-8 -12 0 -24 q8 -12 0 -24"/>
+      <path class="steam2" d="M332 292 q-8 -12 0 -24 q8 -12 0 -24"/>
+    </g>
+  </g>
+
+  <!-- little potted plant -->
+  <g>
+    <path d="M120 336 h44 l-6 30 a8 8 0 0 1 -8 7 h-16 a8 8 0 0 1 -8 -7 Z" fill="#d97757"/>
+    <path d="M142 336 q-2 -30 -22 -42 q22 4 24 30" fill="#7c9879"/>
+    <path d="M142 336 q2 -34 26 -44 q-18 8 -22 34" fill="#234534"/>
+    <path d="M142 336 q0 -20 0 -34" fill="none" stroke="#234534" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>

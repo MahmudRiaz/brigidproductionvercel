@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 420" width="460" height="420" role="img" aria-label="An older person resting comfortably in an armchair at home, a warm lamp and a cat nearby.">
+  <defs>
+    <radialGradient id="lampglow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#f0e3c2" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#f0e3c2" stop-opacity="0"/>
+    </radialGradient>
+    <style>
+      @media (prefers-reduced-motion: no-preference) {
+        .glow { animation: lamp 5s ease-in-out infinite; }
+        @keyframes lamp { 0%,100% { opacity: 0.85; } 50% { opacity: 1; } }
+      }
+    </style>
+  </defs>
+
+  <!-- warm lamp glow -->
+  <circle class="glow" cx="360" cy="150" r="150" fill="url(#lampglow)"/>
+
+  <!-- floor -->
+  <path d="M20 372 H440" stroke="#e2d6bf" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- side table + lamp -->
+  <g>
+    <rect x="342" y="250" width="14" height="122" rx="4" fill="#234534"/>
+    <rect x="300" y="238" width="98" height="16" rx="6" fill="#1a3225"/>
+    <rect x="356" y="132" width="8" height="112" fill="#234534"/>
+    <path d="M336 132 h48 l-10 -34 h-28 Z" fill="#c89a3a"/>
+    <ellipse cx="360" cy="132" rx="24" ry="5" fill="#234534"/>
+  </g>
+
+  <!-- armchair back + wings -->
+  <path d="M96 372 V214 a58 58 0 0 1 58 -58 h96 a58 58 0 0 1 58 58 V372 Z" fill="#1a3225"/>
+  <!-- seat cushion -->
+  <path d="M104 372 v-58 a20 20 0 0 1 20 -20 h156 a20 20 0 0 1 20 20 V372 Z" fill="#234534"/>
+  <!-- armrests -->
+  <rect x="80" y="286" width="40" height="86" rx="18" fill="#234534"/>
+  <rect x="288" y="286" width="40" height="86" rx="18" fill="#234534"/>
+
+  <!-- seated figure silhouette -->
+  <g fill="#7c9879">
+    <!-- head -->
+    <circle cx="204" cy="196" r="30"/>
+    <!-- soft hair / bun -->
+    <path d="M176 190 a28 28 0 0 1 56 0 q-6 -20 -28 -20 q-22 0 -28 20 Z" fill="#c8d6c0"/>
+    <circle cx="180" cy="182" r="10" fill="#c8d6c0"/>
+    <!-- shoulders / torso -->
+    <path d="M164 300 q0 -60 40 -70 q40 10 40 70 Z" />
+  </g>
+  <!-- blanket over lap -->
+  <path d="M150 372 v-30 q54 -26 108 0 v30 Z" fill="#d97757"/>
+  <path d="M150 344 q54 -24 108 0" fill="none" stroke="#b85c5c" stroke-width="4" opacity="0.6"/>
+
+  <!-- cat curled on floor -->
+  <g fill="#2c3329">
+    <ellipse cx="392" cy="360" rx="34" ry="16"/>
+    <circle cx="368" cy="352" r="12"/>
+    <path d="M360 344 l4 -8 3 8 Z"/>
+    <path d="M374 344 l3 -8 4 8 Z"/>
+    <path d="M420 356 q14 -2 16 8 q-8 4 -16 -8" />
+  </g>
+</svg>

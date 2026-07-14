@@ -492,6 +492,91 @@ img { max-width: 100%; display: block; }
 .ask-item p { font-size: 14.5px; line-height: 1.6; color: var(--ink-2); margin: 0; }
 
 /* ============================================================================
+   Imagery — illustrations now, photo-ready for later
+   ========================================================================== */
+/* Frame any illustration or photo. Add .duotone to a photo to tint it into the
+   brand palette (see README → "Adding your own photos"). */
+.media-figure {
+  position: relative; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--line); box-shadow: var(--shadow); background: var(--sage-bg);
+  aspect-ratio: 4 / 3;
+}
+.media-figure.tall { aspect-ratio: 4 / 5; }
+.media-figure.square { aspect-ratio: 1 / 1; }
+.media-figure > img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+.media-figure.contain { background: var(--paper); }
+.media-figure.contain > img { object-fit: contain; }
+/* Duotone: forces a colour photo into a forest→sage wash so it matches the site */
+.media-figure.duotone > img { filter: grayscale(1) contrast(1.04) brightness(1.02); }
+.media-figure.duotone::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(145deg, rgba(26,50,37,0.62), rgba(124,152,121,0.22) 70%, rgba(200,154,58,0.18));
+  mix-blend-mode: color;
+}
+.media-figure .cap {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 20px 16px;
+  background: linear-gradient(transparent, rgba(15,36,25,0.78));
+  color: var(--cream); font-size: 13px; line-height: 1.4; z-index: 1;
+}
+/* Round portrait */
+.portrait { width: 100%; max-width: 340px; }
+.portrait img { width: 100%; display: block; }
+
+/* Soft decorative blob behind a figure */
+.figure-wrap { position: relative; }
+.figure-wrap .blob {
+  position: absolute; border-radius: 46% 54% 58% 42% / 52% 44% 56% 48%;
+  filter: blur(2px); z-index: -1;
+}
+
+/* ============================================================================
+   Ambient motion
+   ========================================================================== */
+@keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+@keyframes floaty2 { 0%,100% { transform: translateY(0) translateX(0); } 50% { transform: translateY(10px) translateX(-8px); } }
+.float { animation: floaty 8s var(--ease) infinite; }
+.float.slow { animation: floaty2 12s var(--ease) infinite; }
+@media (prefers-reduced-motion: reduce) { .float, .float.slow { animation: none; } }
+
+/* ============================================================================
+   Paper grain — a whisper of texture over the whole page
+   ========================================================================== */
+body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 90;
+  opacity: 0.035; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ============================================================================
+   Testimonial / human voice
+   ========================================================================== */
+.quote-block { max-width: 900px; margin: 0 auto; text-align: center; }
+.quote-mark {
+  font-family: var(--display); font-size: 90px; line-height: 0.6; color: var(--sage);
+  opacity: 0.5; height: 44px; display: block;
+}
+.quote-block blockquote {
+  font-family: var(--display); font-weight: 400; margin: 0;
+  font-size: clamp(26px, 4vw, 46px); line-height: 1.18; letter-spacing: -0.02em; color: var(--ink);
+}
+.quote-block blockquote em { font-style: italic; color: var(--sage); }
+.bleed-forest .quote-block blockquote, .bleed-forest-deep .quote-block blockquote { color: var(--cream); }
+.bleed-forest .quote-block blockquote em, .bleed-forest-deep .quote-block blockquote em { color: var(--sage-light); }
+.bleed-forest .quote-mark, .bleed-forest-deep .quote-mark { color: var(--sage-light); }
+.quote-by { display: inline-flex; align-items: center; gap: 14px; margin-top: 34px; }
+.quote-by .avatar {
+  width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--forest), var(--sage));
+  color: var(--cream); display: grid; place-items: center;
+  font-family: var(--display); font-size: 18px;
+}
+.quote-by .who { text-align: left; }
+.quote-by .who .n { font-weight: 600; font-size: 15px; color: var(--ink); }
+.bleed-forest .quote-by .who .n, .bleed-forest-deep .quote-by .who .n { color: var(--cream); }
+.quote-by .who .r { font-size: 13px; color: var(--muted); }
+.bleed-forest .quote-by .who .r, .bleed-forest-deep .quote-by .who .r { color: rgba(245,239,228,0.6); }
+
+/* ============================================================================
    Responsive
    ========================================================================== */
 @media (max-width: 940px) {

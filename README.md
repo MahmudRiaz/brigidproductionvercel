@@ -41,6 +41,39 @@ in `assets/`, not from a framework.
 | `assets/brigid.css` | The whole design system — colours, type, components, responsive rules |
 | `assets/brigid.js` | Scroll reveals, sticky nav, mobile menu, FAQ accordion, stat count-ups, form handling |
 | `assets/favicon.svg` | Brand mark (a hearth flame) |
+| `assets/img/illo-morning.svg` | Sunrise-through-a-window scene (How it works hero) — has gentle animated steam & light |
+| `assets/img/illo-armchair.svg` | An older person resting at home (Home testimonial) — has an animated lamp glow |
+| `assets/img/illo-portrait.svg` | Portrait of "Eleanor" (About → her story) |
+
+## Imagery — and how to add your own photos
+
+The warm visuals are **original illustrations** (in the brand palette, so they always
+match and always load). They're placeholders you can keep, or swap for real
+photography whenever you have it. There's a ready-made component for exactly that.
+
+**To drop in a real photo**, replace an illustration `<img>` with a framed figure:
+
+```html
+<div class="media-figure duotone tall">
+  <img src="assets/img/your-photo.jpg" alt="Describe the photo for screen readers" />
+  <div class="cap">Optional caption</div>   <!-- omit if you don't want one -->
+</div>
+```
+
+- `duotone` washes any colour photo into the forest/sage brand palette so it blends
+  in. Drop it to show the photo in full colour.
+- Size modifiers: `tall` (4:5), `square` (1:1), or omit for the default 4:3.
+- `contain` (instead of cropping) if the image shouldn't be cropped.
+
+**Where to find free, properly-licensed photos:** [Pexels](https://www.pexels.com),
+[Unsplash](https://unsplash.com), and [Wikimedia Commons](https://commons.wikimedia.org)
+all have collections of older adults under licenses that allow commercial use.
+Download the file into `assets/img/` and reference it as above.
+
+> **A note for a health brand:** photos of identifiable people need the right
+> license *and*, ideally, the person's consent — especially when they're presented
+> as patients. Until you have real, consenting stories, the illustrations (and the
+> clearly-labelled example testimonial on the home page) keep the site honest.
 
 ## A few notes
 
