@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Brigid — Family Dashboard (live demo)</title>
+<meta name="description" content="A live, interactive demo of the Brigid family dashboard, built around Eleanor Ward's twelfth day of recovery after a hip replacement." />
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --cream: #f5efe4; --cream-2: #ece3d2; --cream-3: #e2d6bf; --paper: #fbf7ee;
+    --ink: #11140f; --ink-2: #2c3329; --muted: #6c7062; --muted-2: #989a8c;
+    --forest: #1a3225; --forest-2: #234534; --sage: #7c9879;
+    --sage-light: #c8d6c0; --sage-bg: #e3ead8;
+    --coral: #d97757; --coral-bg: #f4d9cc;
+    --amber: #c89a3a; --amber-bg: #f0e3c2;
+    --rose: #b85c5c; --rose-bg: #f0d4d4;
+    --success: #4f7a4d; --success-bg: #d6e3cd;
+    --line: rgba(26,50,37,0.10); --line-2: rgba(26,50,37,0.18);
+    --shadow-sm: 0 1px 2px rgba(26,50,37,0.04);
+    --shadow: 0 6px 24px -8px rgba(26,50,37,0.12);
+    --shadow-lg: 0 20px 60px -20px rgba(26,50,37,0.18);
+    --serif: 'Newsreader','Instrument Serif',Georgia,serif;
+    --display: 'Instrument Serif','Newsreader',Georgia,serif;
+    --sans: 'Geist',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--cream);color:var(--ink);font-size:15px;line-height:1.5;min-height:100vh}
+  button{font:inherit;cursor:pointer;border:0;background:transparent;color:inherit}
+  input{font:inherit}
+  a{color:inherit;text-decoration:none}
+  ::selection{background:var(--forest);color:var(--cream)}
+  .serif{font-family:var(--serif);font-weight:400;letter-spacing:-0.01em}
+  .display{font-family:var(--display);font-weight:400;letter-spacing:-0.02em;line-height:1}
+  .italic{font-style:italic}
+  #root{min-height:100vh}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;background:var(--forest);color:var(--cream);font-size:14px;font-weight:500;transition:transform .15s ease,background .15s ease}
+  .btn:hover{background:var(--forest-2);transform:translateY(-1px)}
+  .btn-ghost{background:transparent;color:var(--forest);border:1px solid var(--line-2)}
+  .btn-ghost:hover{background:rgba(26,50,37,0.04)}
+  .btn-light{background:var(--cream-2);color:var(--forest)}
+  .btn-light:hover{background:var(--cream-3)}
+  .dash{background:var(--cream);min-height:100vh}
+  .dash-nav{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid var(--line);background:var(--paper);position:sticky;top:0;z-index:30}
+  .dash-nav-left{display:flex;align-items:center;gap:28px}
+  .dash-nav-tabs{display:flex;gap:4px}
+  .tab{padding:8px 14px;border-radius:999px;font-size:13px;color:var(--ink-2);transition:background .15s ease}
+  .tab:hover{background:rgba(26,50,37,0.05)}
+  .tab.active{background:var(--forest);color:var(--cream)}
+  .dash-nav-right{display:flex;align-items:center;gap:12px}
+  .back-link{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);padding:7px 13px;border-radius:999px;border:1px solid var(--line-2);transition:background .15s ease,color .15s ease}
+  .back-link:hover{background:rgba(26,50,37,0.04);color:var(--forest)}
+  .demo-pill{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;font-weight:600;color:var(--sage);background:var(--sage-bg);padding:4px 9px;border-radius:999px}
+  .user-bubble{display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;background:var(--cream-2);border-radius:999px}
+  .user-bubble .avatar{width:30px;height:30px;border-radius:50%;background:var(--forest);color:var(--cream);display:grid;place-items:center;font-size:12px;font-weight:500}
+  .user-bubble .name{font-size:13px;line-height:1.15}
+  .user-bubble .name .rel{font-size:11px;color:var(--muted);display:block}
+  .dash-main{max-width:1320px;margin:0 auto;padding:32px 32px 80px}
+  .patient-hero{display:grid;grid-template-columns:1.4fr 1fr;gap:32px;margin-bottom:32px;align-items:stretch}
+  .patient-card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:28px 32px;display:flex;flex-direction:column;gap:18px}
+  .patient-top{display:flex;align-items:flex-start;justify-content:space-between;gap:24px}
+  .patient-id{display:flex;align-items:center;gap:18px}
+  .patient-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--forest),var(--sage));color:var(--cream);display:grid;place-items:center;font-family:var(--display);font-size:24px}
+  .patient-name{font-family:var(--display);font-size:36px;line-height:1.05;letter-spacing:-0.02em}
+  .patient-meta{font-size:13px;color:var(--muted);margin-top:4px}
+  .status-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:500}
+  .status-pill.green{background:var(--success-bg);color:var(--success)}
+  .status-pill.amber{background:var(--amber-bg);color:var(--amber)}
+  .status-pill.red{background:var(--coral-bg);color:var(--coral)}
+  .patient-summary{background:var(--cream);border-radius:14px;padding:16px 18px;font-size:14px;line-height:1.55;color:var(--ink-2);border-left:3px solid var(--sage)}
+  .patient-summary .label{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .quick-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+  .quick-stat{padding:4px 14px;border-right:1px solid var(--line)}
+  .quick-stat:first-child{padding-left:0}
+  .quick-stat:last-child{border-right:0;padding-right:0}
+  .quick-stat .qs-label{font-size:11px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase}
+  .quick-stat .qs-value{font-family:var(--display);font-size:22px;color:var(--ink);margin-top:2px}
+  .next-call-card{background:var(--forest);color:var(--cream);border-radius:20px;padding:28px 32px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+  .next-call-card::after{content:'';position:absolute;right:-40px;top:-40px;width:220px;height:220px;border-radius:50%;background:rgba(245,239,228,0.06)}
+  .next-call-card .label{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;opacity:0.7}
+  .next-call-card .when{font-family:var(--display);font-size:38px;line-height:1;margin-top:8px;letter-spacing:-0.02em}
+  .next-call-card .sub{font-size:14px;opacity:0.78;margin-top:6px}
+  .next-call-card .actions{display:flex;gap:8px;margin-top:18px;position:relative;z-index:1}
+  .btn-light-on-dark{padding:9px 16px;border-radius:999px;background:rgba(245,239,228,0.12);color:var(--cream);font-size:13px;border:1px solid rgba(245,239,228,0.18);transition:background .15s ease}
+  .btn-light-on-dark:hover{background:rgba(245,239,228,0.2)}
+  .rings-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:32px}
+  .ring-card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:18px;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+  .ring-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--line-2)}
+  .ring-card-head{display:flex;align-items:center;justify-content:space-between}
+  .ring-card-title{font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);font-weight:500}
+  .ring-card-cta{font-size:12px;color:var(--forest);display:flex;align-items:center;gap:4px;opacity:0.7}
+  .ring-card:hover .ring-card-cta{opacity:1}
+  .ring-card-body{display:grid;grid-template-columns:1fr 1.1fr;gap:18px;align-items:center}
+  .ring-label{font-size:14px;color:var(--ink-2)}
+  .ring-delta{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px;margin-top:2px}
+  .ring-delta.up{color:var(--success)}
+  .ring-delta.down{color:var(--coral)}
+  .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:32px}
+  .card-grid.two{grid-template-columns:1.4fr 1fr}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:16px}
+  .card-clickable{cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+  .card-clickable:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--line-2)}
+  .card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .card-eyebrow{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);font-weight:500}
+  .card-title{font-family:var(--display);font-size:24px;line-height:1.1;letter-spacing:-0.01em;color:var(--ink);margin-top:4px}
+  .card-sub{font-size:13px;color:var(--muted);margin-top:4px}
+  .bar-row{display:flex;align-items:center;gap:12px;font-size:13px}
+  .bar-row .bar-label{width:110px;color:var(--ink-2)}
+  .bar-row .bar-track{flex:1;height:8px;background:var(--cream-2);border-radius:999px;overflow:hidden}
+  .bar-row .bar-fill{height:100%;border-radius:999px;transition:width .4s ease}
+  .bar-row .bar-val{width:48px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink);font-weight:500}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+  .legend .item{display:flex;align-items:center;gap:6px}
+  .legend .swatch{width:10px;height:10px;border-radius:3px}
+  .trend-cells{display:grid;grid-template-columns:repeat(14,1fr);gap:4px}
+  .trend-cells .cell{aspect-ratio:1;border-radius:4px;border:1px solid transparent;cursor:pointer;transition:transform .1s ease}
+  .trend-cells .cell:hover{transform:scale(1.15)}
+  .blood-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:16px;padding:14px 0;border-bottom:1px dashed var(--line)}
+  .blood-row:last-child{border-bottom:0}
+  .blood-name{font-size:14px;color:var(--ink)}
+  .blood-name .layman{font-size:12px;color:var(--muted);margin-top:2px;display:block}
+  .blood-val{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+  .blood-val .v{font-family:var(--display);font-size:22px;line-height:1;color:var(--ink)}
+  .blood-val .v .u{font-size:12px;color:var(--muted);margin-left:3px}
+  .blood-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:500}
+  .blood-tag.normal{background:var(--success-bg);color:var(--success)}
+  .blood-tag.high{background:var(--coral-bg);color:var(--coral)}
+  .blood-tag.low{background:var(--amber-bg);color:var(--amber)}
+  .timeline-list{display:flex;flex-direction:column;gap:0}
+  .timeline-item{display:grid;grid-template-columns:90px 1fr;gap:16px;padding:14px 0;border-top:1px solid var(--line);cursor:pointer;transition:background .12s ease}
+  .timeline-item:hover{background:var(--cream);margin:0 -12px;padding:14px 12px;border-radius:8px}
+  .timeline-item:first-child{border-top:0}
+  .timeline-when{display:flex;flex-direction:column;gap:2px}
+  .timeline-when .day{font-family:var(--display);font-size:18px;line-height:1;color:var(--ink)}
+  .timeline-when .time{font-size:11px;color:var(--muted)}
+  .timeline-body{display:flex;flex-direction:column;gap:4px}
+  .timeline-body .title{font-size:14px;color:var(--ink);display:flex;align-items:center;gap:8px}
+  .timeline-body .snippet{font-size:13px;color:var(--ink-2);line-height:1.5}
+  .status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .status-dot.green{background:var(--success)}
+  .status-dot.amber{background:var(--amber)}
+  .status-dot.red{background:var(--coral)}
+  .modal-backdrop{position:fixed;inset:0;z-index:50;background:rgba(17,20,15,0.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:grid;place-items:center;padding:24px;animation:fadeIn .2s ease}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .modal{background:var(--paper);border-radius:22px;max-width:720px;width:100%;max-height:86vh;overflow-y:auto;border:1px solid var(--line);box-shadow:var(--shadow-lg);animation:slideUp .25s ease}
+  .modal-head{display:flex;align-items:flex-start;justify-content:space-between;padding:28px 32px 16px;gap:16px}
+  .modal-title{font-family:var(--display);font-size:32px;line-height:1.05;letter-spacing:-0.01em}
+  .modal-sub{font-size:13px;color:var(--muted);margin-top:6px}
+  .modal-close{width:32px;height:32px;border-radius:50%;background:var(--cream-2);display:grid;place-items:center;flex-shrink:0}
+  .modal-close:hover{background:var(--cream-3)}
+  .modal-body{padding:0 32px 32px}
+  .modal-section{padding:20px 0;border-top:1px solid var(--line)}
+  .modal-section:first-child{border-top:0}
+  .modal-section h4{font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin:0 0 12px;font-weight:500}
+  .laymanbox{background:var(--cream);border-radius:12px;padding:14px 16px;font-size:14px;color:var(--ink-2);line-height:1.55;border-left:3px solid var(--sage)}
+  .laymanbox .lbl{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--sage);font-weight:500;display:block;margin-bottom:4px}
+  .sec-label{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 16px}
+  .sec-label h2{font-family:var(--display);font-size:26px;letter-spacing:-0.01em;margin:0;font-weight:400}
+  .sec-label .meta{font-size:12px;color:var(--muted)}
+  @media(max-width:1100px){
+    .patient-hero{grid-template-columns:1fr}
+    .rings-row,.card-grid,.card-grid.two{grid-template-columns:1fr}
+    .quick-stats{grid-template-columns:repeat(2,1fr);gap:12px}
+    .quick-stat{border-right:0;padding-left:0}
+    .dash-nav{padding:16px 20px}
+    .dash-main{padding:24px 20px 80px}
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+<script type="text/babel">
+// Mock patient data — Eleanor Ward, hip replacement recovery
+const PATIENT = {
+  name: "Eleanor Ward",
+  initials: "EW",
+  age: 78,
+  recoveryDay: 12,
+  procedure: "Right hip replacement",
+  surgeryDate: "April 24, 2026",
+  phone: "(613) 555-0142",
+  status: "well",
+  statusLabel: "Recovering well",
+  lastCheckIn: "Today, 9:14 am",
+  nextCall: "Tomorrow, 9:00 am",
+  summary: "Eleanor reported feeling stronger today than yesterday. Pain has decreased from a 4 to a 2. She walked to the kitchen unassisted and ate a full breakfast. All morning medications taken on time. No new symptoms reported.",
+  primary: { name: "Dr. Sarah Chen", clinic: "Kingston General Hospital", phone: "(613) 555-0188" }
+};
+
+const FAMILY_USER = { name: "Mary Ward", initials: "MW", relation: "Daughter" };
+
+const STATUS_TREND_14D = ['green','green','green','amber','green','green','green','green','green','green','green','amber','green','green'];
+const RECOVERY_14D = [62, 64, 68, 65, 70, 73, 74, 76, 78, 80, 79, 78, 82, 84];
+const PAIN_14D = [6, 5, 5, 4, 4, 4, 3, 3, 3, 3, 2, 3, 2, 2];
+const SLEEP_14D = [5.2, 5.8, 6.0, 6.2, 6.5, 6.4, 6.8, 7.0, 7.2, 6.9, 7.1, 7.3, 7.5, 7.4];
+const MOOD_14D = [3, 3, 4, 3, 4, 4, 4, 4, 5, 4, 4, 4, 5, 5];
+const MOOD_LABELS = { 1: 'Down', 2: 'Low', 3: 'Quiet', 4: 'Okay', 5: 'Bright' };
+const MOOD_COLORS = { 1: '#b85c5c', 2: '#d97757', 3: '#c89a3a', 4: '#7c9879', 5: '#4f7a4d' };
+const MOBILITY_14D = ['Bed to chair','Bed to chair','Walking indoors','Walking indoors','Walking indoors','Walking indoors','To the porch','To the porch','Around the house','Around the house','Around the house','Around the house','To the porch + stairs','Made own breakfast'];
+
+const DAILY_TASKS = [
+  { label: 'Eating meals',  level: 'independent', detail: 'On her own' },
+  { label: 'Getting dressed', level: 'independent', detail: 'On her own' },
+  { label: 'Bathing',        level: 'independent', detail: 'Uses shower seat' },
+  { label: 'Walking indoors',level: 'independent', detail: 'Cane for distance' },
+  { label: 'Climbing stairs',level: 'help', detail: 'Help with handrail' },
+  { label: 'Getting in/out of bed', level: 'help', detail: 'Daughter helps mornings' }
+];
+
+const MEDS = [
+  { name: 'Apixaban', dose: '2.5 mg', schedule: '2× daily', purpose: 'Blood thinner — prevents clots after surgery', taken: 23, total: 24 },
+  { name: 'Acetaminophen', dose: '500 mg', schedule: 'as needed', purpose: 'Pain relief', taken: 17, total: 18 },
+  { name: 'Ferrous sulfate', dose: '325 mg', schedule: 'daily', purpose: 'Iron supplement — supports recovery from blood loss', taken: 12, total: 12 },
+  { name: 'Pantoprazole', dose: '40 mg', schedule: 'daily', purpose: 'Protects stomach lining', taken: 11, total: 12 }
+];
+
+const ADHERENCE = { pct: 96, prev: 91, taken: 63, missed: 3, total: 66 };
+
+const BLOODWORK = {
+  drawn: 'May 8, 2026',
+  panel: 'Post-op Complete Blood Count + Metabolic',
+  results: [
+    { name: 'Hemoglobin', layman: 'How well blood carries oxygen', value: 11.8, unit: 'g/dL', range: [12.0, 16.0], status: 'low', note: 'Slightly low — expected after surgery. Brigid is helping reinforce iron supplements and tracking energy levels.' },
+    { name: 'White Blood Cells', layman: 'Infection-fighting cells', value: 7.2, unit: 'K/µL', range: [4.5, 11.0], status: 'normal', note: 'Normal range. No signs of infection.' },
+    { name: 'Platelets', layman: 'Helps blood clot', value: 240, unit: 'K/µL', range: [150, 400], status: 'normal', note: 'Normal range. Healing well.' },
+    { name: 'Creatinine', layman: 'How well kidneys are working', value: 0.9, unit: 'mg/dL', range: [0.6, 1.2], status: 'normal', note: 'Kidneys functioning normally.' },
+    { name: 'Sodium', layman: 'Body salt balance', value: 138, unit: 'mmol/L', range: [135, 145], status: 'normal', note: 'Hydration looks good.' },
+    { name: 'Potassium', layman: 'Important for heart rhythm', value: 4.4, unit: 'mmol/L', range: [3.5, 5.0], status: 'normal', note: 'Heart rhythm support is normal.' },
+    { name: 'CRP', layman: 'Marker of inflammation', value: 12, unit: 'mg/L', range: [0, 10], status: 'high', note: 'Mildly elevated — typical post-surgery inflammation. Trending down from 28 last week.' }
+  ]
+};
+
+const CALLS = [
+  { date: 'Tue, May 12', day: 'Today', time: '9:14 am', duration: '6 min 24 sec', status: 'green', title: 'All well — pain down to 2/10',
+    snippet: 'Eleanor reports feeling stronger. Walked to the kitchen unassisted. Slept 7.4 hours. All meds taken.',
+    pain: 2, sleep: 7.4, mood: 5, meds: 'all taken', flags: [] },
+  { date: 'Mon, May 11', day: 'Mon', time: '9:08 am', duration: '5 min 51 sec', status: 'green', title: 'Steady recovery — sleep improving',
+    snippet: 'Slept 7.3 hours, longest stretch since surgery. Pain 3/10. No new concerns. Mentioned mild constipation — Brigid suggested fluids.',
+    pain: 3, sleep: 7.3, mood: 5, meds: 'all taken', flags: ['Mild constipation noted'] },
+  { date: 'Sun, May 10', day: 'Sun', time: '9:01 am', duration: '6 min 02 sec', status: 'green', title: 'Good night, full appetite',
+    snippet: 'Pain 3/10. Walked outside to the porch yesterday with daughter. Mood up.',
+    pain: 3, sleep: 6.9, mood: 4, meds: 'all taken', flags: [] },
+  { date: 'Sat, May 9',  day: 'Sat', time: '9:10 am', duration: '7 min 18 sec', status: 'amber', title: 'Skipped evening Pantoprazole',
+    snippet: 'Eleanor reports forgetting last night\'s stomach medication. Brigid reinforced importance and set a reminder.',
+    pain: 3, sleep: 7.2, mood: 4, meds: 'Pantoprazole missed', flags: ['Missed medication: Pantoprazole'] },
+  { date: 'Fri, May 8',  day: 'Fri', time: '9:03 am', duration: '5 min 44 sec', status: 'green', title: 'Blood draw appointment confirmed',
+    snippet: 'Pain 4/10. Confirmed transportation to lab with daughter Mary. All morning meds taken.',
+    pain: 4, sleep: 7.0, mood: 4, meds: 'all taken', flags: [] },
+  { date: 'Thu, May 7',  day: 'Thu', time: '9:05 am', duration: '6 min 11 sec', status: 'green', title: 'Mood improving — playing piano again',
+    snippet: 'Mood up. Played piano for 15 minutes. Pain 4/10. Sleep 6.8 hours.',
+    pain: 4, sleep: 6.8, mood: 4, meds: 'all taken', flags: [] },
+  { date: 'Wed, May 6',  day: 'Wed', time: '9:12 am', duration: '5 min 28 sec', status: 'green', title: 'Routine check — no concerns',
+    snippet: 'Pain 4/10. Steady on all meds. Slight fatigue noted.',
+    pain: 4, sleep: 6.4, mood: 4, meds: 'all taken', flags: [] },
+  { date: 'Tue, May 5',  day: 'Tue', time: '9:06 am', duration: '6 min 03 sec', status: 'green', title: 'First walk outside',
+    snippet: 'Pain 4/10. Daughter helped Eleanor walk to the porch — about 30 feet. Pleased with progress.',
+    pain: 4, sleep: 6.5, mood: 4, meds: 'all taken', flags: [] },
+  { date: 'Mon, May 4',  day: 'Mon', time: '9:09 am', duration: '7 min 02 sec', status: 'amber', title: 'Pain spike overnight',
+    snippet: 'Reports pain reached 6/10 around 3am. Took Acetaminophen and slept again. Pain back to 4/10 this morning.',
+    pain: 5, sleep: 5.8, mood: 3, meds: 'all taken', flags: ['Pain spike overnight'] },
+  { date: 'Sun, May 3',  day: 'Sun', time: '9:00 am', duration: '6 min 36 sec', status: 'green', title: 'Settling into routine',
+    snippet: 'Pain 4/10. Slept better last night — 6.2 hours. Appetite returning. Mood quiet but steady.',
+    pain: 4, sleep: 6.2, mood: 3, meds: 'all taken', flags: [] },
+  { date: 'Sat, May 2',  day: 'Sat', time: '9:04 am', duration: '7 min 49 sec', status: 'green', title: 'Family visit cheered her up',
+    snippet: 'Mood lifted after grandchildren visited. Pain 4/10. Walked to bathroom unassisted.',
+    pain: 4, sleep: 6.0, mood: 4, meds: 'all taken', flags: [] },
+  { date: 'Fri, May 1',  day: 'Fri', time: '9:14 am', duration: '8 min 12 sec', status: 'amber', title: 'Tearful — first week home is hard',
+    snippet: 'Eleanor sounded tearful. Said she felt low and missed independence. Brigid spent extra time listening and reassuring. Suggested a family check-in.',
+    pain: 5, sleep: 5.8, mood: 2, meds: 'all taken', flags: ['Mood low — first week home'] },
+  { date: 'Thu, Apr 30', day: 'Thu', time: '9:07 am', duration: '6 min 19 sec', status: 'green', title: 'Discharge meds review',
+    snippet: 'Brigid confirmed all 4 medications, dose, timing. Pain 5/10. Sleep 5.2 hours.',
+    pain: 5, sleep: 5.2, mood: 3, meds: 'all taken', flags: [] },
+  { date: 'Wed, Apr 29', day: 'Wed', time: '9:15 am', duration: '9 min 41 sec', status: 'green', title: 'First call — welcome & orientation',
+    snippet: 'Welcome call. Brigid introduced herself, explained the daily check-ins, confirmed contact info and consent.',
+    pain: 6, sleep: 5.2, mood: 3, meds: 'all taken', flags: [] }
+];
+
+const UPCOMING = [
+  { when: 'Tomorrow', time: '9:00 am', title: 'Brigid daily check-in', kind: 'brigid' },
+  { when: 'Thu, May 14', time: '2:30 pm', title: 'Physiotherapy — Home visit', kind: 'appt' },
+  { when: 'Mon, May 18', time: '10:00 am', title: 'Follow-up — Dr. Sarah Chen', kind: 'appt' },
+  { when: 'Tue, May 19', time: 'all day', title: 'Apixaban refill due', kind: 'med' }
+];
+
+const MED_SCHEDULE_TODAY = [
+  { time: '8:00 am',  name: 'Apixaban',       dose: '2.5 mg', taken: true,  takenAt: '8:04 am' },
+  { time: '8:00 am',  name: 'Pantoprazole',   dose: '40 mg',  taken: true,  takenAt: '8:04 am' },
+  { time: '8:00 am',  name: 'Ferrous sulfate',dose: '325 mg', taken: true,  takenAt: '8:12 am' },
+  { time: 'as needed',name: 'Acetaminophen', dose: '500 mg', taken: true,  takenAt: '6:30 am', note: 'For morning stiffness' },
+  { time: '8:00 pm',  name: 'Apixaban',       dose: '2.5 mg', taken: false, upcoming: true }
+];
+
+const COMING_SOON = [
+  { tag: 'PHQ-9',    title: 'Depression screening',       desc: 'Validated 9-question mood screen, asked over the phone in small conversational pieces.' },
+  { tag: 'GAD-7',    title: 'Anxiety screening',          desc: 'Brief 7-question anxiety check — flags worsening anxiety early so families can intervene.' },
+  { tag: 'T-MoCA',   title: 'Memory & attention',         desc: 'Telephone Montreal Cognitive Assessment — catches post-operative confusion and early cognitive decline.' },
+  { tag: 'Barthel',  title: 'Independence score',         desc: 'Formal scoring of 10 daily activities — tracks functional recovery with a single number out of 100.' },
+  { tag: 'EQ-5D',    title: 'Quality of life',            desc: 'Standardised five-dimension self-report — what life feels like overall, not just the body.' },
+  { tag: 'RGA',      title: 'Rapid Geriatric Assessment', desc: 'Frailty, nutrition, falls risk — full picture of how your loved one is doing as they age.' }
+];
+
+const RECORDS_DEFAULTS = {
+  about: { fullName: 'Eleanor Margaret Ward', dob: 'March 14, 1948', languages: 'English, French', pronouns: 'she/her', preferredName: 'Ellie' },
+  conditions: [
+    { name: 'Type 2 diabetes', detail: 'Diagnosed 2014, well controlled with metformin' },
+    { name: 'Hypertension',    detail: 'Diagnosed 2008, on amlodipine' },
+    { name: 'Osteoarthritis',  detail: 'Right hip — replaced April 24, 2026' }
+  ],
+  allergies: [
+    { name: 'Penicillin', detail: 'Hives, documented 1995' },
+    { name: 'Shellfish',  detail: 'GI upset' }
+  ],
+  contacts: [
+    { name: 'Mary Ward',     relation: 'Daughter (primary)', phone: '(613) 555-0144' },
+    { name: 'James Ward',    relation: 'Son',                phone: '(416) 555-0192' },
+    { name: 'Dr. Sarah Chen',relation: 'Family physician',   phone: '(613) 555-0188' }
+  ],
+  home: { livingWith: 'Lives alone; daughter visits 4× per week', stairs: 'Yes — 8 steps to bedroom on second floor', aids: 'Walker, shower seat, raised toilet seat', pets: 'Cat — Henry' },
+  preferences: { diet: 'Diabetic-friendly. Vegetarian most days.', waking: 'Up by 6:30 am — best time to call', rest: 'Afternoon nap 2–3 pm — no calls in this window' },
+  notes: [
+    { date: 'May 11, 2026', author: 'Mary (daughter)', text: 'Mom mentioned her right knee feeling stiff. Not sure if connected to the hip. Bringing it up at Monday\'s follow-up.' },
+    { date: 'May 4, 2026',  author: 'Mary (daughter)', text: 'Hired weekend cleaner for next 6 weeks. Eleanor agreed she\'d let them help with laundry.' }
+  ],
+  documents: [
+    { name: 'Discharge summary — KGH Apr 24.pdf', size: '320 KB', uploaded: 'Apr 26, 2026', by: 'Mary' },
+    { name: 'Post-op physiotherapy plan.pdf',     size: '180 KB', uploaded: 'Apr 29, 2026', by: 'Mary' },
+    { name: 'Blood work — May 8.pdf',             size: '92 KB',  uploaded: 'May 8, 2026',  by: 'Auto-synced' }
+  ]
+};
+
+Object.assign(window, {
+  PATIENT, FAMILY_USER, STATUS_TREND_14D, RECOVERY_14D,
+  PAIN_14D, SLEEP_14D, MOOD_14D, MOOD_LABELS, MOOD_COLORS, MOBILITY_14D,
+  DAILY_TASKS, MEDS, MED_SCHEDULE_TODAY, ADHERENCE,
+  BLOODWORK, CALLS, UPCOMING, COMING_SOON, RECORDS_DEFAULTS
+});
+</script>
+<script type="text/babel">
+// Shared visual primitives: rings, sparklines, etc.
+const { useState, useEffect, useRef } = React;
+
+function Ring({ value, max = 100, size = 140, stroke = 12, color = '#1a3225', track = '#ece3d2', children, animate = true, gradient }) {
+  const [v, setV] = useState(animate ? 0 : value);
+  useEffect(() => {
+    if (!animate) { setV(value); return; }
+    const t = setTimeout(() => setV(value), 80);
+    return () => clearTimeout(t);
+  }, [value, animate]);
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const pct = Math.max(0, Math.min(1, v / max));
+  const gradId = 'g-' + Math.random().toString(36).slice(2, 9);
+  return (
+    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
+      <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+        {gradient && (
+          <defs>
+            <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor={gradient[0]} />
+              <stop offset="100%" stopColor={gradient[1]} />
+            </linearGradient>
+          </defs>
+        )}
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={track} strokeWidth={stroke} />
+        <circle cx={size/2} cy={size/2} r={r} fill="none"
+          stroke={gradient ? `url(#${gradId})` : color}
+          strokeWidth={stroke} strokeLinecap="round"
+          strokeDasharray={c} strokeDashoffset={c * (1 - pct)}
+          style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(.2,.7,.2,1)' }} />
+      </svg>
+      <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', textAlign: 'center' }}>{children}</div>
+    </div>
+  );
+}
+
+function MultiRing({ values, size = 150, gap = 4, stroke = 8, colors = ['#1a3225','#7c9879','#c89a3a'], track = '#ece3d2', children }) {
+  const rings = values.map((v, i) => ({ v, inset: i * (stroke + gap) }));
+  return (
+    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
+      {rings.map((ring, i) => {
+        const sz = size - ring.inset * 2;
+        const r = (sz - stroke) / 2;
+        const c = 2 * Math.PI * r;
+        const pct = Math.max(0, Math.min(1, ring.v / 100));
+        return (
+          <svg key={i} width={sz} height={sz} style={{ position: 'absolute', top: ring.inset, left: ring.inset, transform: 'rotate(-90deg)' }}>
+            <circle cx={sz/2} cy={sz/2} r={r} fill="none" stroke={track} strokeWidth={stroke} />
+            <circle cx={sz/2} cy={sz/2} r={r} fill="none" stroke={colors[i]} strokeWidth={stroke} strokeLinecap="round"
+              strokeDasharray={c} strokeDashoffset={c * (1 - pct)}
+              style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(.2,.7,.2,1)' }} />
+          </svg>
+        );
+      })}
+      <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', textAlign: 'center' }}>{children}</div>
+    </div>
+  );
+}
+
+function Sparkline({ data, w = 220, h = 56, color = '#1a3225', fill = '#e3ead8', invert = false, lastDotColor }) {
+  if (!data || data.length === 0) return null;
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = max - min || 1;
+  const stepX = w / (data.length - 1);
+  const pts = data.map((d, i) => {
+    const x = i * stepX;
+    const y = h - ((d - min) / range) * (h - 10) - 5;
+    return [x, invert ? h - y : y];
+  });
+  const path = pts.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(' ');
+  const area = `${path} L${w},${h} L0,${h} Z`;
+  const last = pts[pts.length - 1];
+  return (
+    <svg width={w} height={h} style={{ display: 'block', overflow: 'visible' }}>
+      <path d={area} fill={fill} opacity="0.55" />
+      <path d={path} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx={last[0]} cy={last[1]} r="4" fill={lastDotColor || color} stroke="#fbf7ee" strokeWidth="2" />
+    </svg>
+  );
+}
+
+function StatusGrid({ data, onCellClick }) {
+  const colorFor = (s) => ({ green: 'var(--success-bg)', amber: 'var(--amber-bg)', red: 'var(--coral-bg)' }[s] || 'var(--cream-2)');
+  const borderFor = (s) => ({ green: 'var(--success)', amber: 'var(--amber)', red: 'var(--coral)' }[s] || 'var(--line)');
+  return (
+    <div className="trend-cells">
+      {data.map((s, i) => (
+        <div key={i} className="cell" style={{ background: colorFor(s), borderColor: borderFor(s) + '40' }}
+          title={`Day ${i + 1}: ${s}`} onClick={() => onCellClick && onCellClick(i, s)} />
+      ))}
+    </div>
+  );
+}
+
+const Icons = {
+  arrow: (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" {...p}><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  arrowUp: (p={}) => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" {...p}><path d="m6 14 6-6 6 6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  arrowDown: (p={}) => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" {...p}><path d="m6 10 6 6 6-6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  phone: (p={}) => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" {...p}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  calendar: (p={}) => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" {...p}><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.6"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>,
+  pill: (p={}) => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" {...p}><rect x="3.5" y="8" width="17" height="8" rx="4" transform="rotate(-45 12 12)" stroke="currentColor" strokeWidth="1.6"/><path d="M14.5 9.5l-5 5" stroke="currentColor" strokeWidth="1.6"/></svg>,
+  heart: (p={}) => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" {...p}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/></svg>,
+  walking: (p={}) => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" {...p}><circle cx="13" cy="4" r="2" stroke="currentColor" strokeWidth="1.6"/><path d="m4 22 5-9 4 2 3-5 4 4M10 13 6 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  droplet: (p={}) => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" {...p}><path d="M12 2.7s5.5 5.7 5.5 10.3a5.5 5.5 0 0 1-11 0c0-4.6 5.5-10.3 5.5-10.3Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/></svg>,
+  spark: (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" {...p}><path d="M3 12h4l3-9 4 18 3-9h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  close: (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" {...p}><path d="M18 6 6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>,
+  sparkle: (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" {...p}><path d="M12 3v3M12 18v3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M3 12h3M18 12h3M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>,
+  chevron: (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" {...p}><path d="m9 6 6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  check: (p={}) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" {...p}><path d="m5 12 5 5L20 7" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+};
+
+Object.assign(window, { Ring, MultiRing, Sparkline, StatusGrid, Icons });
+</script>
+<script type="text/babel">
+// Family Dashboard
+const { useState: useStateD } = React;
+
+function Dashboard({ onSignOut }) {
+  const [modal, setModal] = useStateD(null);
+  const [activeTab, setActiveTab] = useStateD('overview');
+  const [callDetail, setCallDetail] = useStateD(null);
+
+  return (
+    <div className="dash">
+      <DashNav activeTab={activeTab} setActiveTab={setActiveTab} onSignOut={onSignOut} />
+      <main className="dash-main">
+        {activeTab === 'overview' && <OverviewPage onOpenModal={setModal} />}
+        {activeTab === 'calls'    && <CallsPage onOpenCall={(c) => { setCallDetail(c); setModal('calls'); }} />}
+        {activeTab === 'meds'     && <MedicationsPage />}
+        {activeTab === 'records'  && <RecordsPage />}
+      </main>
+      {modal && <DetailModal kind={modal} callDetail={callDetail} onClose={() => { setModal(null); setCallDetail(null); }} />}
+    </div>
+  );
+}
+
+function OverviewPage({ onOpenModal: setModal }) {
+  return (
+    <>
+      <PatientHero onOpenCall={() => setModal('calls')} />
+      <RingsRow onOpen={setModal} />
+      <div className="sec-label"><h2>Today's call</h2><span className="meta">Updated {PATIENT.lastCheckIn}</span></div>
+      <TodaysCallCard onOpen={() => setModal('calls')} />
+      <div className="sec-label" style={{ marginTop: 36 }}><h2>How she's doing</h2><span className="meta">Tap any card for the 14-day trend</span></div>
+      <div className="card-grid">
+        <PainCard onClick={() => setModal('pain')} />
+        <SleepCard onClick={() => setModal('sleep')} />
+        <MoodCard onClick={() => setModal('mood')} />
+      </div>
+      <div className="card-grid two">
+        <DailyFunctionCard onClick={() => setModal('function')} />
+        <UpcomingCard />
+      </div>
+      <div className="sec-label" style={{ marginTop: 36 }}><h2>Blood work</h2><span className="meta">Latest results, in plain language</span></div>
+      <BloodworkCard onClick={() => setModal('bloodwork')} />
+      <div className="sec-label" style={{ marginTop: 36 }}><h2>Brigid call timeline</h2><span className="meta">Last 7 days</span></div>
+      <TimelineCard onCall={() => setModal('calls')} />
+      <ComingSoonSection />
+    </>
+  );
+}
+
+function DashNav({ activeTab, setActiveTab, onSignOut }) {
+  const logo = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40'%3E%3Ctext y='30' font-family='Georgia%2C serif' font-size='28' fill='%231a3225' font-style='italic'%3EBrigid%3C/text%3E%3C/svg%3E";
+  return (
+    <nav className="dash-nav">
+      <div className="dash-nav-left">
+        <a href="index.html" className="logo-mark" title="Back to brigidhealth.ca" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <img src={logo} alt="Brigid" style={{ height: 28 }} />
+          <span className="demo-pill">Live demo</span>
+        </a>
+        <div className="dash-nav-tabs">
+          {['overview','calls','meds','records'].map(t => (
+            <button key={t} className={'tab ' + (activeTab === t ? 'active' : '')} onClick={() => setActiveTab(t)}>
+              {t === 'overview' ? 'Overview' : t === 'calls' ? 'Call history' : t === 'meds' ? 'Medications' : 'Records'}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="dash-nav-right">
+        <a className="back-link" href="index.html">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 12H5m6-6-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          Back to site
+        </a>
+        <div className="user-bubble">
+          <div className="avatar">{FAMILY_USER.initials}</div>
+          <div className="name">{FAMILY_USER.name}<span className="rel">{FAMILY_USER.relation}</span></div>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+function PatientHero({ onOpenCall }) {
+  return (
+    <section className="patient-hero">
+      <div className="patient-card">
+        <div className="patient-top">
+          <div className="patient-id">
+            <div className="patient-avatar">{PATIENT.initials}</div>
+            <div>
+              <div className="patient-name">{PATIENT.name}</div>
+              <div className="patient-meta">{PATIENT.age} years old · {PATIENT.procedure} · Day {PATIENT.recoveryDay} of recovery</div>
+            </div>
+          </div>
+          <span className={'status-pill ' + (PATIENT.status === 'well' ? 'green' : PATIENT.status === 'watch' ? 'amber' : 'red')}>
+            <span className={'status-dot ' + (PATIENT.status === 'well' ? 'green' : PATIENT.status === 'watch' ? 'amber' : 'red')} />
+            {PATIENT.statusLabel}
+          </span>
+        </div>
+        <div className="patient-summary" onClick={onOpenCall} style={{ cursor: 'pointer' }}>
+          <div className="label"><Icons.sparkle style={{ verticalAlign: 'middle', marginRight: 4 }} /> Brigid's note · {PATIENT.lastCheckIn}</div>
+          {PATIENT.summary}
+        </div>
+        <div className="quick-stats">
+          <div className="quick-stat"><div className="qs-label">Surgery</div><div className="qs-value">Apr 24</div></div>
+          <div className="quick-stat"><div className="qs-label">Recovery day</div><div className="qs-value">{PATIENT.recoveryDay}</div></div>
+          <div className="quick-stat"><div className="qs-label">Phone</div><div className="qs-value" style={{ fontSize: 16 }}>{PATIENT.phone}</div></div>
+          <div className="quick-stat"><div className="qs-label">Primary care</div><div className="qs-value" style={{ fontSize: 16 }}>Dr. Chen</div></div>
+        </div>
+      </div>
+      <div className="next-call-card">
+        <div>
+          <div className="label">Next Brigid call</div>
+          <div className="when">Tomorrow<br/>9:00 am</div>
+          <div className="sub">A short morning check-in — 5 to 8 minutes.</div>
+        </div>
+        <div className="actions">
+          <button className="btn-light-on-dark"><Icons.calendar /> &nbsp;Reschedule</button>
+          <button className="btn-light-on-dark">Listen in <Icons.chevron /></button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RingsRow({ onOpen }) {
+  const adh = ADHERENCE.pct;
+  const lastRec = RECOVERY_14D[RECOVERY_14D.length - 1];
+  const prevRec = RECOVERY_14D[RECOVERY_14D.length - 2];
+  const recDelta = lastRec - prevRec;
+  const painNow = PAIN_14D[PAIN_14D.length - 1];
+  const sleepNow = SLEEP_14D[SLEEP_14D.length - 1];
+  const moodNow = MOOD_14D[MOOD_14D.length - 1];
+  const painPct = Math.max(0, Math.min(100, (10 - painNow) / 10 * 100));
+  const sleepPct = Math.max(0, Math.min(100, sleepNow / 8 * 100));
+  const moodPct = (moodNow / 5) * 100;
+  const comfort = Math.round((painPct + sleepPct + moodPct) / 3);
+
+  return (
+    <section className="rings-row">
+      <div className="ring-card" onClick={() => onOpen('recovery')}>
+        <div className="ring-card-head">
+          <span className="ring-card-title"><Icons.spark style={{ verticalAlign: 'middle', marginRight: 4 }} />Recovery score</span>
+          <span className="ring-card-cta">Details <Icons.chevron /></span>
+        </div>
+        <div className="ring-card-body">
+          <Ring value={lastRec} size={130} stroke={12} gradient={['#1a3225', '#7c9879']}>
+            <div>
+              <div style={{ fontFamily: 'var(--display)', fontSize: 40, lineHeight: 1, color: 'var(--ink)' }}>{lastRec}</div>
+              <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>of 100</div>
+            </div>
+          </Ring>
+          <div>
+            <div className="ring-label">On track for week 3 — recovering faster than 72% of similar patients.</div>
+            <div className={'ring-delta ' + (recDelta > 0 ? 'up' : 'down')}>
+              {recDelta > 0 ? <Icons.arrowUp /> : <Icons.arrowDown />} {Math.abs(recDelta)} points vs yesterday
+            </div>
+            <Sparkline data={RECOVERY_14D} w={180} h={40} color="var(--forest)" fill="var(--sage-bg)" />
+          </div>
+        </div>
+      </div>
+
+      <div className="ring-card" onClick={() => onOpen('adherence')}>
+        <div className="ring-card-head">
+          <span className="ring-card-title"><Icons.pill style={{ verticalAlign: 'middle', marginRight: 4 }} />Medication adherence</span>
+          <span className="ring-card-cta">Details <Icons.chevron /></span>
+        </div>
+        <div className="ring-card-body">
+          <Ring value={adh} size={130} stroke={12} color="var(--forest)">
+            <div>
+              <div style={{ fontFamily: 'var(--display)', fontSize: 40, lineHeight: 1, color: 'var(--ink)' }}>{adh}<span style={{ fontSize: 18, color: 'var(--muted)' }}>%</span></div>
+              <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>last 14 days</div>
+            </div>
+          </Ring>
+          <div>
+            <div className="ring-label">{ADHERENCE.taken} of {ADHERENCE.total} doses taken on time. {ADHERENCE.missed} missed.</div>
+            <div className="ring-delta up"><Icons.arrowUp /> Up from {ADHERENCE.prev}% last week</div>
+            <div style={{ display: 'flex', gap: 4, marginTop: 8 }}>
+              {MEDS.map(m => {
+                const pct = m.taken / m.total;
+                const color = pct === 1 ? 'var(--success)' : pct >= 0.9 ? 'var(--sage)' : 'var(--amber)';
+                return (
+                  <div key={m.name} style={{ flex: 1 }}>
+                    <div style={{ height: 6, borderRadius: 3, background: 'var(--cream-2)', overflow: 'hidden' }}>
+                      <div style={{ width: (pct*100)+'%', height: '100%', background: color, borderRadius: 3 }} />
+                    </div>
+                    <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="ring-card" onClick={() => onOpen('comfort')}>
+        <div className="ring-card-head">
+          <span className="ring-card-title"><Icons.heart style={{ verticalAlign: 'middle', marginRight: 4 }} />Comfort today</span>
+          <span className="ring-card-cta">Details <Icons.chevron /></span>
+        </div>
+        <div className="ring-card-body">
+          <MultiRing values={[painPct, sleepPct, moodPct]} size={130} stroke={9} gap={3} colors={['#1a3225','#7c9879','#c89a3a']}>
+            <div>
+              <div style={{ fontFamily: 'var(--display)', fontSize: 36, lineHeight: 1, color: 'var(--ink)' }}>{comfort}</div>
+              <div style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>out of 100</div>
+            </div>
+          </MultiRing>
+          <div>
+            <div className="legend" style={{ flexDirection: 'column', gap: 6, fontSize: 12 }}>
+              <div className="item"><span className="swatch" style={{ background: 'var(--forest)' }} /> Pain <span style={{ color: 'var(--ink)', marginLeft: 'auto', fontWeight: 500 }}>{painNow}/10</span></div>
+              <div className="item"><span className="swatch" style={{ background: 'var(--sage)' }} /> Sleep <span style={{ color: 'var(--ink)', marginLeft: 'auto', fontWeight: 500 }}>{sleepNow} hr</span></div>
+              <div className="item"><span className="swatch" style={{ background: 'var(--amber)' }} /> Mood <span style={{ color: 'var(--ink)', marginLeft: 'auto', fontWeight: 500 }}>{MOOD_LABELS[moodNow]}</span></div>
+            </div>
+            <div className="ring-delta up" style={{ marginTop: 8 }}><Icons.arrowUp /> Pain easing, sleep deepening</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TodaysCallCard({ onOpen }) {
+  return (
+    <div className="card card-clickable" onClick={onOpen} style={{ padding: 28 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 24, alignItems: 'flex-start' }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+            <span className="status-pill green"><span className="status-dot green" /> All well</span>
+            <span style={{ fontSize: 13, color: 'var(--muted)' }}>Recovery day 12 · 9:14 am · 6 min 24 sec call</span>
+          </div>
+          <p style={{ fontFamily: 'var(--serif)', fontSize: 22, lineHeight: 1.4, color: 'var(--ink)', margin: '0 0 18px', maxWidth: 760 }}>
+            "I feel stronger today. The pain is much less, maybe a 2 out of 10. I walked to the kitchen by myself and made my own toast — that's the first time in a week."
+          </p>
+          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+            <DataPip label="Pain" value="2/10" trend="↓ from 3" trendUp />
+            <DataPip label="Sleep" value="7.4 hr" trend="↑ from 7.3" trendUp />
+            <DataPip label="Mood" value="Up" />
+            <DataPip label="Appetite" value="Full breakfast" />
+            <DataPip label="Falls" value="None" />
+            <DataPip label="New symptoms" value="None reported" />
+          </div>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <button className="btn-light" style={{ padding: '10px 16px', borderRadius: 999, fontSize: 13, background: 'var(--cream-2)', display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icons.spark /> Read full transcript</button>
+          <button className="btn-light" style={{ padding: '10px 16px', borderRadius: 999, fontSize: 13, background: 'var(--cream-2)', display: 'inline-flex', alignItems: 'center', gap: 6 }}><Icons.phone /> Listen to recording</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DataPip({ label, value, trend, trendUp }) {
+  return (
+    <div>
+      <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 2 }}>{label}</div>
+      <div style={{ fontFamily: 'var(--display)', fontSize: 22, lineHeight: 1, color: 'var(--ink)' }}>{value}</div>
+      {trend && <div style={{ fontSize: 11, color: trendUp ? 'var(--success)' : 'var(--muted)', marginTop: 3 }}>{trend}</div>}
+    </div>
+  );
+}
+
+function PainCard({ onClick }) {
+  const last = PAIN_14D[PAIN_14D.length - 1];
+  const first = PAIN_14D[0];
+  const drop = first - last;
+  return (
+    <div className="card card-clickable" onClick={onClick}>
+      <div className="card-head"><div><div className="card-eyebrow"><Icons.spark style={{ verticalAlign: 'middle', marginRight: 4 }} /> Pain</div><div className="card-title">Pain has come way down</div></div></div>
+      <div style={{ display: 'flex', gap: 16, alignItems: 'flex-end' }}>
+        <div>
+          <div style={{ fontFamily: 'var(--display)', fontSize: 46, lineHeight: 1, color: 'var(--ink)' }}>{last}<span style={{ fontSize: 18, color: 'var(--muted)' }}>/10</span></div>
+          <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>this morning</div>
+        </div>
+        <div style={{ flex: 1 }}><Sparkline data={PAIN_14D.map(v => 10 - v)} w={200} h={56} color="var(--forest)" fill="var(--sage-bg)" /></div>
+      </div>
+      <div className="laymanbox"><span className="lbl">What this means</span>Eleanor's reported pain has dropped {drop} points since recovery began. Most surgical pain settles to a 2 or below by week 3. She's right on track.</div>
+    </div>
+  );
+}
+
+function SleepCard({ onClick }) {
+  const last = SLEEP_14D[SLEEP_14D.length - 1];
+  const avg = (SLEEP_14D.slice(-7).reduce((a,b) => a+b, 0) / 7).toFixed(1);
+  return (
+    <div className="card card-clickable" onClick={onClick}>
+      <div className="card-head"><div><div className="card-eyebrow"><Icons.heart style={{ verticalAlign: 'middle', marginRight: 4 }} /> Sleep & rest</div><div className="card-title">Sleeping the longest in weeks</div></div></div>
+      <div style={{ display: 'flex', gap: 16, alignItems: 'flex-end' }}>
+        <div>
+          <div style={{ fontFamily: 'var(--display)', fontSize: 46, lineHeight: 1, color: 'var(--ink)' }}>{last}<span style={{ fontSize: 18, color: 'var(--muted)' }}> hr</span></div>
+          <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>last night</div>
+        </div>
+        <div style={{ flex: 1 }}><Sparkline data={SLEEP_14D} w={200} h={56} color="var(--sage)" fill="var(--sage-bg)" /></div>
+      </div>
+      <div className="laymanbox"><span className="lbl">What this means</span>Average {avg} hours this week, up from 5.2 the night after surgery. Good sleep is one of the strongest signals of a smooth recovery.</div>
+    </div>
+  );
+}
+
+function MoodCard({ onClick }) {
+  const last = MOOD_14D[MOOD_14D.length - 1];
+  return (
+    <div className="card card-clickable" onClick={onClick}>
+      <div className="card-head"><div><div className="card-eyebrow"><Icons.sparkle style={{ verticalAlign: 'middle', marginRight: 4 }} /> Mood & spirits</div><div className="card-title">"I feel like myself again."</div></div></div>
+      <div style={{ display: 'flex', gap: 16, alignItems: 'flex-end' }}>
+        <div>
+          <div style={{ fontFamily: 'var(--display)', fontSize: 36, lineHeight: 1, color: MOOD_COLORS[last] }}>{MOOD_LABELS[last]}</div>
+          <div style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 4 }}>today</div>
+        </div>
+        <div style={{ flex: 1, display: 'flex', gap: 3, alignItems: 'flex-end', height: 56 }}>
+          {MOOD_14D.map((m, i) => (
+            <div key={i} style={{ flex: 1, height: (m / 5 * 100) + '%', background: MOOD_COLORS[m], borderRadius: 3, opacity: i === MOOD_14D.length - 1 ? 1 : 0.55 }} />
+          ))}
+        </div>
+      </div>
+      <div className="laymanbox"><span className="lbl">What this means</span>Brigid listens for tone, hesitation, and what Eleanor talks about. Today she sounded bright and engaged — a clear lift from the quieter first week home.</div>
+    </div>
+  );
+}
+
+function DailyFunctionCard({ onClick }) {
+  return (
+    <div className="card card-clickable" onClick={onClick}>
+      <div className="card-head"><div><div className="card-eyebrow"><Icons.walking style={{ verticalAlign: 'middle', marginRight: 4 }} /> Daily activities</div><div className="card-title">Doing most things on her own</div></div></div>
+      <p style={{ fontSize: 14, color: 'var(--ink-2)', margin: 0, lineHeight: 1.5 }}>Brigid asks about six everyday tasks each call. Here's what Eleanor said today.</p>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        {DAILY_TASKS.map(t => (
+          <div key={t.label} style={{ padding: 10, borderRadius: 10, background: t.level === 'independent' ? 'var(--success-bg)' : 'var(--amber-bg)', display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span className={'status-dot ' + (t.level === 'independent' ? 'green' : 'amber')} />
+              <span style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 500 }}>{t.label}</span>
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--ink-2)', paddingLeft: 14 }}>{t.detail}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ComingSoonSection() {
+  return (
+    <section style={{ marginTop: 56 }}>
+      <div className="sec-label"><h2>Coming soon</h2><span className="meta">In future versions of Brigid</span></div>
+      <div className="card" style={{ padding: 28, background: 'var(--cream)', border: '1px dashed var(--line-2)' }}>
+        <p style={{ fontSize: 15, color: 'var(--ink-2)', margin: '0 0 24px', maxWidth: 720, lineHeight: 1.55 }}>
+          V1 keeps the conversation simple and friendly. In V2 and beyond, Brigid will weave validated clinical screening tools into the daily call — giving you a deeper, doctor-grade view without making Eleanor feel like she's filling out forms.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
+          {COMING_SOON.map(s => (
+            <div key={s.tag} style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 14, padding: 18, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--sage)', fontWeight: 600 }}>{s.tag}</span>
+                <span style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>V2</span>
+              </div>
+              <div style={{ fontFamily: 'var(--display)', fontSize: 18, color: 'var(--ink)', lineHeight: 1.2 }}>{s.title}</div>
+              <div style={{ fontSize: 13, color: 'var(--ink-2)', lineHeight: 1.5 }}>{s.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BloodworkCard({ onClick }) {
+  return (
+    <div className="card card-clickable" onClick={onClick}>
+      <div className="card-head">
+        <div>
+          <div className="card-eyebrow"><Icons.droplet style={{ verticalAlign: 'middle', marginRight: 4 }} /> Latest blood work</div>
+          <div className="card-title">{BLOODWORK.panel}</div>
+          <div className="card-sub">Drawn {BLOODWORK.drawn}</div>
+        </div>
+        <span className="status-pill amber" style={{ padding: '4px 10px', fontSize: 12 }}>2 flagged · within expectation</span>
+      </div>
+      <div>
+        {BLOODWORK.results.slice(0, 4).map(r => (
+          <div key={r.name} className="blood-row">
+            <div className="blood-name">{r.name}<span className="layman">{r.layman}</span></div>
+            <div className="blood-val">
+              <div className="v">{r.value}<span className="u">{r.unit}</span></div>
+              <span className={'blood-tag ' + r.status}>
+                {r.status === 'normal' ? <Icons.check /> : r.status === 'high' ? <Icons.arrowUp /> : <Icons.arrowDown />}
+                &nbsp;{r.status === 'normal' ? 'Normal' : r.status === 'high' ? 'High' : 'Low'}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ fontSize: 13, color: 'var(--forest)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>View all 7 results <Icons.chevron /></div>
+    </div>
+  );
+}
+
+function UpcomingCard() {
+  const kindIcon = { brigid: <Icons.phone />, appt: <Icons.calendar />, med: <Icons.pill /> };
+  const kindColor = { brigid: 'var(--forest)', appt: 'var(--sage)', med: 'var(--amber)' };
+  return (
+    <div className="card">
+      <div className="card-head"><div><div className="card-eyebrow"><Icons.calendar style={{ verticalAlign: 'middle', marginRight: 4 }} /> Upcoming</div><div className="card-title">Calls & appointments</div></div></div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+        {UPCOMING.map((u, i) => (
+          <div key={i} style={{ display: 'grid', gridTemplateColumns: '32px 1fr auto', gap: 12, alignItems: 'center', padding: '12px 0', borderTop: i ? '1px solid var(--line)' : 0 }}>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--cream-2)', color: kindColor[u.kind], display: 'grid', placeItems: 'center' }}>{kindIcon[u.kind]}</div>
+            <div><div style={{ fontSize: 14, color: 'var(--ink)' }}>{u.title}</div><div style={{ fontSize: 12, color: 'var(--muted)' }}>{u.when} · {u.time}</div></div>
+            <Icons.chevron style={{ color: 'var(--muted)' }} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TimelineCard({ onCall }) {
+  return (
+    <div className="card">
+      <div className="timeline-list">
+        {CALLS.map((c, i) => (
+          <div key={i} className="timeline-item" onClick={onCall}>
+            <div className="timeline-when"><div className="day">{c.day}</div><div className="time">{c.time}</div></div>
+            <div className="timeline-body">
+              <div className="title"><span className={'status-dot ' + c.status} />{c.title}</div>
+              <div className="snippet">{c.snippet}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function DetailModal({ kind, callDetail, onClose }) {
+  React.useEffect(() => {
+    const h = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, [onClose]);
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <ModalContent kind={kind} callDetail={callDetail} onClose={onClose} />
+      </div>
+    </div>
+  );
+}
+
+function ModalContent({ kind, callDetail, onClose }) {
+  if (kind === 'recovery')  return <RecoveryModal onClose={onClose} />;
+  if (kind === 'adherence') return <AdherenceModal onClose={onClose} />;
+  if (kind === 'comfort')   return <ComfortModal onClose={onClose} />;
+  if (kind === 'pain')      return <ComfortModal onClose={onClose} />;
+  if (kind === 'sleep')     return <ComfortModal onClose={onClose} />;
+  if (kind === 'mood')      return <ComfortModal onClose={onClose} />;
+  if (kind === 'function')  return <FunctionModal onClose={onClose} />;
+  if (kind === 'bloodwork') return <BloodworkModal onClose={onClose} />;
+  if (kind === 'calls')     return <CallsModal callDetail={callDetail} onClose={onClose} />;
+  return null;
+}
+
+function ModalHeader({ title, sub, onClose }) {
+  return (
+    <div className="modal-head">
+      <div><div className="modal-title">{title}</div><div className="modal-sub">{sub}</div></div>
+      <button className="modal-close" onClick={onClose}><Icons.close /></button>
+    </div>
+  );
+}
+
+function RecoveryModal({ onClose }) {
+  return (
+    <div>
+      <ModalHeader title="Recovery score" sub="A simple composite of how Eleanor is doing today" onClose={onClose} />
+      <div className="modal-body">
+        <div className="modal-section"><h4>14-day trend</h4><ChartLine data={RECOVERY_14D} color="var(--forest)" fill="var(--sage-bg)" yMin={50} yMax={100} /></div>
+        <div className="modal-section">
+          <h4>What goes into this score</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {[
+              { label: 'Pain easing', val: 80, color: 'var(--forest)' },
+              { label: 'Sleeping well', val: 78, color: 'var(--sage)' },
+              { label: 'Mood & spirits', val: 85, color: 'var(--amber)' },
+              { label: 'Medications on time', val: 96, color: 'var(--coral)' },
+              { label: 'Moving around the home', val: 82, color: 'var(--rose)' }
+            ].map(r => (
+              <div key={r.label} className="bar-row">
+                <div className="bar-label" style={{ width: 200 }}>{r.label}</div>
+                <div className="bar-track"><div className="bar-fill" style={{ width: r.val+'%', background: r.color }} /></div>
+                <div className="bar-val">{r.val}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="modal-section"><h4>What this means</h4><div className="laymanbox"><span className="lbl">In plain words</span>A score above 80 means Eleanor is recovering well and on a similar trajectory to other patients her age and procedure. Below 60 would warrant a closer look. Above 90 is full recovery.</div></div>
+      </div>
+    </div>
+  );
+}
+
+function AdherenceModal({ onClose }) {
+  return (
+    <div>
+      <ModalHeader title="Medication adherence" sub={`${ADHERENCE.pct}% of doses taken on time over the last 14 days`} onClose={onClose} />
+      <div className="modal-body">
+        <div className="modal-section">
+          <h4>Today's medications</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {MEDS.map(m => {
+              const pct = m.taken / m.total;
+              return (
+                <div key={m.name} style={{ display: 'grid', gridTemplateColumns: '44px 1fr auto', gap: 14, alignItems: 'center' }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--cream)', display: 'grid', placeItems: 'center', color: 'var(--forest)' }}><Icons.pill /></div>
+                  <div>
+                    <div style={{ fontSize: 15, color: 'var(--ink)' }}>{m.name} <span style={{ color: 'var(--muted)', fontSize: 13 }}>· {m.dose} · {m.schedule}</span></div>
+                    <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{m.purpose}</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontFamily: 'var(--display)', fontSize: 18 }}>{m.taken}<span style={{ color: 'var(--muted)' }}>/{m.total}</span></div>
+                    <div style={{ fontSize: 11, color: 'var(--muted)' }}>14-day doses</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div className="modal-section"><h4>How Brigid measures this</h4><div className="laymanbox"><span className="lbl">In plain words</span>Each morning Brigid confirms which medications were taken the day before and reinforces today's schedule. We don't rely on Eleanor's memory alone — when available, Brigid cross-references prescription pickup data.</div></div>
+      </div>
+    </div>
+  );
+}
+
+function ComfortModal({ onClose }) {
+  return (
+    <div>
+      <ModalHeader title="Comfort today" sub="Pain, sleep, and mood — three things Brigid asks about every morning" onClose={onClose} />
+      <div className="modal-body">
+        <div className="modal-section">
+          <h4>Pain — last 14 days</h4>
+          <ChartLine data={PAIN_14D} color="var(--forest)" fill="var(--sage-bg)" yMin={0} yMax={8} invert />
+          <div className="laymanbox" style={{ marginTop: 12 }}><span className="lbl">What this means</span>Pain today is <strong>2/10</strong>. Down from 6/10 at discharge. A 2 means it's noticeable but not interfering with daily activities.</div>
+        </div>
+        <div className="modal-section">
+          <h4>Sleep — hours per night</h4>
+          <ChartLine data={SLEEP_14D} color="var(--sage)" fill="var(--sage-bg)" yMin={4} yMax={9} />
+          <div className="laymanbox" style={{ marginTop: 12 }}><span className="lbl">What this means</span><strong>7.4 hours last night.</strong> Healthy adults Eleanor's age typically aim for 7 to 8 hours. She's there — a strong sign the body is repairing well.</div>
+        </div>
+        <div className="modal-section">
+          <h4>Mood — how she sounds on the call</h4>
+          <div style={{ display: 'flex', gap: 3, alignItems: 'flex-end', height: 80, margin: '8px 0 12px' }}>
+            {MOOD_14D.map((m, i) => (
+              <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                <div style={{ width: '100%', height: (m / 5 * 100) + '%', background: MOOD_COLORS[m], borderRadius: 3, opacity: i === MOOD_14D.length - 1 ? 1 : 0.55 }} />
+              </div>
+            ))}
+          </div>
+          <div className="laymanbox"><span className="lbl">What this means</span>Brigid notes tone, hesitation, and what Eleanor brings up unprompted. Today she sounded <strong>{MOOD_LABELS[MOOD_14D[MOOD_14D.length-1]]}</strong> — the most positive end of the scale. A formal mood-screening score (PHQ-9) is coming in V2.</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FunctionModal({ onClose }) {
+  return (
+    <div>
+      <ModalHeader title="Daily activities" sub="What Eleanor said about everyday tasks this morning" onClose={onClose} />
+      <div className="modal-body">
+        <div className="modal-section">
+          <h4>This morning's check-in</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {DAILY_TASKS.map(t => (
+              <div key={t.label} style={{ display: 'grid', gridTemplateColumns: '14px 1fr auto', gap: 12, padding: '12px 14px', alignItems: 'center', borderRadius: 12, background: 'var(--cream)' }}>
+                <span className={'status-dot ' + (t.level === 'independent' ? 'green' : 'amber')} />
+                <div><div style={{ fontSize: 14, color: 'var(--ink)' }}>{t.label}</div><div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{t.detail}</div></div>
+                <span className={'blood-tag ' + (t.level === 'independent' ? 'normal' : 'low')}>
+                  {t.level === 'independent' ? <Icons.check /> : <Icons.arrowDown />}&nbsp;{t.level === 'independent' ? 'On her own' : 'Needs help'}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="modal-section"><h4>What this means</h4><div className="laymanbox"><span className="lbl">In plain words</span>Eleanor is independent with 4 of 6 daily tasks. Stairs and getting out of bed still need a hand — typical for week 2 after a hip replacement. Physiotherapy is targeting those exact movements.</div></div>
+      </div>
+    </div>
+  );
+}
+
+function BloodworkModal({ onClose }) {
+  return (
+    <div>
+      <ModalHeader title="Blood work — May 8, 2026" sub={BLOODWORK.panel} onClose={onClose} />
+      <div className="modal-body">
+        <div className="modal-section">
+          {BLOODWORK.results.map(r => (
+            <div key={r.name} style={{ padding: '16px 0', borderTop: '1px solid var(--line)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 16, alignItems: 'flex-start' }}>
+                <div><div style={{ fontSize: 16, color: 'var(--ink)' }}>{r.name}</div><div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>{r.layman}</div></div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontFamily: 'var(--display)', fontSize: 24, lineHeight: 1 }}>{r.value}<span style={{ fontSize: 13, color: 'var(--muted)', marginLeft: 3 }}>{r.unit}</span></div>
+                  <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 3 }}>Normal: {r.range[0]}–{r.range[1]}</div>
+                  <span className={'blood-tag ' + r.status} style={{ marginTop: 6 }}>
+                    {r.status === 'normal' ? <Icons.check /> : r.status === 'high' ? <Icons.arrowUp /> : <Icons.arrowDown />}&nbsp;{r.status === 'normal' ? 'Normal' : r.status === 'high' ? 'High' : 'Low'}
+                  </span>
+                </div>
+              </div>
+              <BloodRange value={r.value} range={r.range} status={r.status} />
+              <div className="laymanbox" style={{ marginTop: 10 }}><span className="lbl">What this means</span>{r.note}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BloodRange({ value, range, status }) {
+  const [lo, hi] = range;
+  const span = hi - lo;
+  const min = lo - span * 0.4;
+  const max = hi + span * 0.4;
+  const pct = (v) => Math.max(0, Math.min(1, (v - min) / (max - min))) * 100;
+  return (
+    <div style={{ position: 'relative', height: 8, background: 'var(--cream-2)', borderRadius: 999, marginTop: 14 }}>
+      <div style={{ position: 'absolute', left: pct(lo)+'%', right: (100-pct(hi))+'%', top: 0, bottom: 0, background: 'var(--sage-light)', borderRadius: 999 }} />
+      <div style={{ position: 'absolute', left: pct(value)+'%', top: -4, width: 16, height: 16, borderRadius: '50%', background: status === 'normal' ? 'var(--forest)' : status === 'high' ? 'var(--coral)' : 'var(--amber)', border: '3px solid var(--paper)', transform: 'translateX(-50%)' }} />
+    </div>
+  );
+}
+
+function CallsModal({ callDetail, onClose }) {
+  const c = callDetail || { date: 'May 12, 2026', time: '9:14 am', duration: '6 min 24 sec', title: PATIENT.summary, snippet: PATIENT.summary, pain: 2, sleep: 7.4, mood: 5, status: 'green', flags: [] };
+  return (
+    <div>
+      <ModalHeader title={c.day === 'Today' || !c.day ? "Today's call" : `Call on ${c.date}`} sub={`${c.date} · ${c.time} · ${c.duration}`} onClose={onClose} />
+      <div className="modal-body">
+        <div className="modal-section">
+          <h4>Quick read</h4>
+          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', marginBottom: 16 }}>
+            <DataPip label="Status" value={c.status === 'green' ? 'All well' : c.status === 'amber' ? 'Worth checking' : 'Needs attention'} />
+            <DataPip label="Pain" value={`${c.pain}/10`} />
+            <DataPip label="Sleep" value={`${c.sleep} hr`} />
+            <DataPip label="Mood" value={MOOD_LABELS[c.mood]} />
+            <DataPip label="Medications" value={c.meds || 'all taken'} />
+          </div>
+          <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink-2)', margin: 0 }}>{c.snippet}</p>
+        </div>
+        <div className="modal-section">
+          <h4>Conversation excerpts</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {[
+              { who: 'Brigid', text: 'Good morning! How are you feeling today compared to yesterday?' },
+              { who: 'Eleanor', text: c.pain <= 3 ? `Oh, much better dear. The pain has really come down. Maybe a ${c.pain} out of 10.` : `I'd say a ${c.pain} out of 10 today. Some moments harder than others.` },
+              { who: 'Brigid', text: 'And your medications — did you take everything yesterday?' },
+              { who: 'Eleanor', text: c.meds === 'all taken' ? 'I did, all of them. The little pink one in the morning and the others at supper.' : `I forgot one — the ${c.meds && c.meds.replace(' missed','')} at supper.` }
+            ].map((e, i) => (
+              <div key={i} style={{ display: 'grid', gridTemplateColumns: '72px 1fr', gap: 12 }}>
+                <div style={{ fontSize: 12, color: e.who === 'Brigid' ? 'var(--sage)' : 'var(--forest)', fontWeight: 500 }}>{e.who}</div>
+                <div style={{ fontSize: 14, color: 'var(--ink-2)', lineHeight: 1.55 }}>{e.text}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="modal-section">
+          <h4>Flagged for your attention</h4>
+          {c.flags && c.flags.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {c.flags.map((f, i) => (<div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14, color: 'var(--ink-2)' }}><span className="status-dot amber" /> {f}</div>))}
+            </div>
+          ) : (
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14, color: 'var(--ink-2)' }}><Icons.check style={{ color: 'var(--success)' }} /> Nothing flagged — all responses within healthy ranges.</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ChartLine({ data, color, fill, yMin, yMax, invert }) {
+  const w = 640, h = 160;
+  const padX = 24, padY = 16;
+  const innerW = w - padX*2, innerH = h - padY*2;
+  const min = yMin != null ? yMin : Math.min(...data);
+  const max = yMax != null ? yMax : Math.max(...data);
+  const range = max - min || 1;
+  const stepX = innerW / (data.length - 1);
+  const pts = data.map((d, i) => {
+    const x = padX + i * stepX;
+    const yNorm = (d - min) / range;
+    const y = padY + innerH - (invert ? 1 - yNorm : yNorm) * innerH;
+    return [x, y];
+  });
+  const path = pts.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(' ');
+  const area = `${path} L${padX + innerW},${padY + innerH} L${padX},${padY + innerH} Z`;
+  return (
+    <div style={{ position: 'relative' }}>
+      <svg viewBox={`0 0 ${w} ${h}`} style={{ width: '100%', height: 160, display: 'block' }} preserveAspectRatio="none">
+        {[0, 0.25, 0.5, 0.75, 1].map((t, i) => (<line key={i} x1={padX} x2={padX + innerW} y1={padY + innerH * t} y2={padY + innerH * t} stroke="var(--line)" strokeDasharray="2 4" />))}
+        <path d={area} fill={fill} opacity="0.6" />
+        <path d={path} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        {pts.map((p, i) => (<circle key={i} cx={p[0]} cy={p[1]} r={i === pts.length - 1 ? 5 : 3} fill={color} stroke="var(--paper)" strokeWidth="2" />))}
+      </svg>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--muted)', marginTop: 4, padding: '0 4px' }}>
+        <span>14 days ago</span><span>7 days ago</span><span>Today</span>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { Dashboard });
+</script>
+<script type="text/babel">
+// Sub-pages: Call history, Medications, Records
+const { useState: useStateP, useEffect: useEffectP } = React;
+
+function CallsPage({ onOpenCall }) {
+  const [filter, setFilter] = useStateP('all');
+  const [search, setSearch] = useStateP('');
+  const filtered = CALLS.filter(c => {
+    if (filter !== 'all' && c.status !== filter) return false;
+    if (search && !(`${c.title} ${c.snippet}`.toLowerCase().includes(search.toLowerCase()))) return false;
+    return true;
+  });
+  const greenCount = CALLS.filter(c => c.status === 'green').length;
+  const amberCount = CALLS.filter(c => c.status === 'amber').length;
+  const redCount = CALLS.filter(c => c.status === 'red').length;
+  return (
+    <div>
+      <PageHeader title="Call history" sub="Every call Brigid has made — in plain language." />
+      <div className="card-grid" style={{ marginBottom: 24 }}>
+        <SummaryStat big={CALLS.length} label="Total calls" sub={`Since ${CALLS[CALLS.length-1].date}`} />
+        <SummaryStat big={greenCount} label="All-well" sub="No concerns flagged" color="var(--success)" />
+        <SummaryStat big={amberCount + redCount} label="Flagged" sub="Worth a closer look" color={amberCount + redCount > 0 ? 'var(--amber)' : 'var(--muted)'} />
+      </div>
+      <div className="card" style={{ marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'space-between', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {[{ v: 'all', label: 'All' }, { v: 'green', label: 'All well' }, { v: 'amber', label: 'Flagged' }].map(f => (
+              <button key={f.v} className={'tab ' + (filter === f.v ? 'active' : '')} onClick={() => setFilter(f.v)}>{f.label}</button>
+            ))}
+          </div>
+          <div style={{ position: 'relative' }}>
+            <input type="text" placeholder="Search calls…" value={search} onChange={(e) => setSearch(e.target.value)}
+              style={{ padding: '8px 14px', borderRadius: 999, fontSize: 13, background: 'var(--cream-2)', border: '1px solid transparent', outline: 'none', width: 220, color: 'var(--ink)' }} />
+          </div>
+        </div>
+      </div>
+      <div className="card">
+        <div className="timeline-list">
+          {filtered.length === 0 && (<div style={{ padding: '40px 16px', textAlign: 'center', color: 'var(--muted)', fontSize: 14 }}>No calls match your filters.</div>)}
+          {filtered.map((c, i) => (
+            <div key={i} className="timeline-item" onClick={() => onOpenCall(c)}>
+              <div className="timeline-when"><div className="day">{c.day}</div><div className="time">{c.time}</div></div>
+              <div className="timeline-body">
+                <div className="title"><span className={'status-dot ' + c.status} />{c.title}</div>
+                <div className="snippet">{c.snippet}</div>
+                <div style={{ display: 'flex', gap: 16, marginTop: 6, fontSize: 11, color: 'var(--muted)', flexWrap: 'wrap' }}>
+                  <span>Duration {c.duration}</span><span>Pain {c.pain}/10</span><span>Sleep {c.sleep} hr</span><span>Mood {MOOD_LABELS[c.mood]}</span>
+                  {c.flags.length > 0 && <span style={{ color: 'var(--amber)' }}>· {c.flags.length} flag{c.flags.length > 1 ? 's' : ''}</span>}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MedicationsPage() {
+  return (
+    <div>
+      <PageHeader title="Medications" sub={`${ADHERENCE.pct}% of doses confirmed by Brigid over the last 14 days · ${ADHERENCE.missed} missed.`} />
+      <div className="card-grid" style={{ marginBottom: 24 }}>
+        <SummaryStat big={ADHERENCE.taken} label="Doses taken" sub={`of ${ADHERENCE.total} scheduled`} />
+        <SummaryStat big={ADHERENCE.missed} label="Doses missed" sub="Brigid couldn't confirm" color={ADHERENCE.missed > 0 ? 'var(--amber)' : 'var(--success)'} />
+        <SummaryStat big={MEDS.length} label="Active medications" sub="Prescribed post-op" />
+      </div>
+      <div className="sec-label"><h2>Today's schedule</h2><span className="meta">Brigid confirms each dose by phone</span></div>
+      <div className="card" style={{ marginBottom: 32 }}>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {MED_SCHEDULE_TODAY.map((d, i) => {
+            const status = d.taken ? 'taken' : (d.upcoming ? 'upcoming' : 'missed');
+            return (
+              <div key={i} style={{ display: 'grid', gridTemplateColumns: '110px 40px 1fr auto', gap: 16, alignItems: 'center', padding: '14px 0', borderTop: i ? '1px solid var(--line)' : 0 }}>
+                <div style={{ fontSize: 13, color: 'var(--ink-2)', fontVariantNumeric: 'tabular-nums' }}>{d.time}</div>
+                <div style={{ width: 32, height: 32, borderRadius: '50%', background: status === 'taken' ? 'var(--success-bg)' : status === 'upcoming' ? 'var(--cream-2)' : 'var(--coral-bg)', color: status === 'taken' ? 'var(--success)' : status === 'upcoming' ? 'var(--muted)' : 'var(--coral)', display: 'grid', placeItems: 'center' }}>
+                  {status === 'taken' ? <Icons.check /> : status === 'upcoming' ? <Icons.calendar /> : <Icons.close />}
+                </div>
+                <div>
+                  <div style={{ fontSize: 14, color: 'var(--ink)' }}>{d.name} <span style={{ color: 'var(--muted)' }}>· {d.dose}</span></div>
+                  {d.note && <div style={{ fontSize: 12, color: 'var(--muted)' }}>{d.note}</div>}
+                </div>
+                <div style={{ fontSize: 12, color: status === 'taken' ? 'var(--success)' : 'var(--muted)' }}>
+                  {status === 'taken' ? `Confirmed at ${d.takenAt}` : status === 'upcoming' ? 'Upcoming' : 'Missed'}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="sec-label"><h2>All active medications</h2></div>
+      <div className="card-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+        {MEDS.map(m => {
+          const pct = m.taken / m.total;
+          const color = pct === 1 ? 'var(--success)' : pct >= 0.9 ? 'var(--sage)' : 'var(--amber)';
+          return (
+            <div key={m.name} className="card">
+              <div className="card-head">
+                <div><div className="card-eyebrow"><Icons.pill style={{ verticalAlign: 'middle', marginRight: 4 }} /> {m.schedule}</div><div className="card-title">{m.name}</div><div className="card-sub">{m.dose}</div></div>
+                <div style={{ textAlign: 'right' }}><div style={{ fontFamily: 'var(--display)', fontSize: 28, lineHeight: 1, color: 'var(--ink)' }}>{Math.round(pct * 100)}<span style={{ fontSize: 14, color: 'var(--muted)' }}>%</span></div><div style={{ fontSize: 11, color: 'var(--muted)' }}>last 14 days</div></div>
+              </div>
+              <div style={{ height: 8, borderRadius: 999, background: 'var(--cream-2)', overflow: 'hidden' }}><div style={{ width: (pct*100)+'%', height: '100%', background: color, borderRadius: 999, transition: 'width .8s ease' }} /></div>
+              <div className="laymanbox"><span className="lbl">What it's for</span>{m.purpose}</div>
+              <div style={{ fontSize: 12, color: 'var(--muted)' }}>{m.taken} of {m.total} doses confirmed by Brigid · {m.total - m.taken} missed</div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+const STORAGE_KEY = 'brigid_records_v1';
+function loadRecords() {
+  try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) return JSON.parse(raw); } catch (e) {}
+  return JSON.parse(JSON.stringify(RECORDS_DEFAULTS));
+}
+function saveRecords(r) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(r)); } catch (e) {} }
+
+function RecordsPage() {
+  const [records, setRecords] = useStateP(loadRecords);
+  const [saved, setSaved] = useStateP(false);
+  useEffectP(() => { saveRecords(records); }, [records]);
+  const flash = () => { setSaved(true); setTimeout(() => setSaved(false), 1800); };
+  const updateAbout = (field, value) => { setRecords(r => ({ ...r, about: { ...r.about, [field]: value } })); flash(); };
+  const updateHome = (field, value) => { setRecords(r => ({ ...r, home: { ...r.home, [field]: value } })); flash(); };
+  const updatePref = (field, value) => { setRecords(r => ({ ...r, preferences: { ...r.preferences, [field]: value } })); flash(); };
+  const addListItem = (key, item) => { setRecords(r => ({ ...r, [key]: [...r[key], item] })); flash(); };
+  const updateListItem = (key, i, item) => { setRecords(r => ({ ...r, [key]: r[key].map((x, idx) => idx === i ? item : x) })); flash(); };
+  const removeListItem = (key, i) => { setRecords(r => ({ ...r, [key]: r[key].filter((_, idx) => idx !== i) })); flash(); };
+  const resetAll = () => {
+    if (confirm('Reset all records to the original example? Your edits will be lost.')) {
+      const fresh = JSON.parse(JSON.stringify(RECORDS_DEFAULTS));
+      setRecords(fresh); saveRecords(fresh);
+    }
+  };
+  return (
+    <div>
+      <PageHeader title="Records" sub="Information about your loved one. Edits save automatically and appear across the portal." />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: saved ? 'var(--success)' : 'var(--muted)', transition: 'color .2s ease' }}>
+          {saved ? <><Icons.check /> Saved</> : <><Icons.check style={{ opacity: 0.4 }} /> All changes saved locally</>}
+        </div>
+        <button onClick={resetAll} style={{ padding: '8px 14px', borderRadius: 999, fontSize: 13, color: 'var(--muted)', border: '1px solid var(--line-2)' }}>Reset to example</button>
+      </div>
+      <RecordSection icon={<Icons.heart />} title="About Eleanor" sub="The basics. These appear on the dashboard header.">
+        <EditField label="Preferred name" value={records.about.preferredName} onChange={(v) => updateAbout('preferredName', v)} />
+        <EditField label="Full legal name" value={records.about.fullName} onChange={(v) => updateAbout('fullName', v)} />
+        <EditField label="Date of birth" value={records.about.dob} onChange={(v) => updateAbout('dob', v)} />
+        <EditField label="Pronouns" value={records.about.pronouns} onChange={(v) => updateAbout('pronouns', v)} />
+        <EditField label="Languages spoken" value={records.about.languages} onChange={(v) => updateAbout('languages', v)} hint="Brigid will call in the preferred language." />
+      </RecordSection>
+      <RecordSection icon={<Icons.spark />} title="Medical conditions" sub="Brigid uses this context when interpreting daily check-ins.">
+        <ListEditor items={records.conditions} fields={[{ key: 'name', placeholder: 'Condition', size: 'sm' }, { key: 'detail', placeholder: 'Detail (when diagnosed, current treatment, etc.)', size: 'lg' }]}
+          onUpdate={(i, v) => updateListItem('conditions', i, v)} onRemove={(i) => removeListItem('conditions', i)} onAdd={() => addListItem('conditions', { name: '', detail: '' })} addLabel="Add a condition" />
+      </RecordSection>
+      <RecordSection icon={<Icons.droplet />} title="Allergies" sub="Critical safety information.">
+        <ListEditor items={records.allergies} fields={[{ key: 'name', placeholder: 'Allergen', size: 'sm' }, { key: 'detail', placeholder: 'Reaction', size: 'lg' }]}
+          onUpdate={(i, v) => updateListItem('allergies', i, v)} onRemove={(i) => removeListItem('allergies', i)} onAdd={() => addListItem('allergies', { name: '', detail: '' })} addLabel="Add an allergy" />
+      </RecordSection>
+      <RecordSection icon={<Icons.phone />} title="Emergency contacts" sub="Who Brigid reaches if something looks concerning.">
+        <ListEditor items={records.contacts} fields={[{ key: 'name', placeholder: 'Name', size: 'sm' }, { key: 'relation', placeholder: 'Relationship', size: 'md' }, { key: 'phone', placeholder: 'Phone', size: 'sm' }]}
+          onUpdate={(i, v) => updateListItem('contacts', i, v)} onRemove={(i) => removeListItem('contacts', i)} onAdd={() => addListItem('contacts', { name: '', relation: '', phone: '' })} addLabel="Add a contact" />
+      </RecordSection>
+      <RecordSection icon={<Icons.walking />} title="Home setup" sub="Helps Brigid know what's realistic to ask about (stairs, who's around, mobility aids).">
+        <EditField label="Living situation" value={records.home.livingWith} onChange={(v) => updateHome('livingWith', v)} />
+        <EditField label="Stairs in the home" value={records.home.stairs} onChange={(v) => updateHome('stairs', v)} />
+        <EditField label="Mobility aids" value={records.home.aids} onChange={(v) => updateHome('aids', v)} />
+        <EditField label="Pets" value={records.home.pets} onChange={(v) => updateHome('pets', v)} />
+      </RecordSection>
+      <RecordSection icon={<Icons.sparkle />} title="Daily preferences" sub="When to call, when not to.">
+        <EditField label="Diet" value={records.preferences.diet} onChange={(v) => updatePref('diet', v)} />
+        <EditField label="Wake time" value={records.preferences.waking} onChange={(v) => updatePref('waking', v)} />
+        <EditField label="Rest window" value={records.preferences.rest} onChange={(v) => updatePref('rest', v)} hint="Brigid avoids calling during this window." />
+      </RecordSection>
+      <RecordSection icon={<Icons.calendar />} title="Family notes" sub="A shared journal for things you've noticed, things to discuss with the doctor, or questions for Brigid.">
+        <NotesEditor notes={records.notes}
+          onAdd={(text) => addListItem('notes', { date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), author: `${FAMILY_USER.name} (${FAMILY_USER.relation})`, text })}
+          onRemove={(i) => removeListItem('notes', i)} />
+      </RecordSection>
+      <RecordSection icon={<Icons.droplet />} title="Documents" sub="Discharge summaries, physiotherapy plans, blood work. Pinned here for the whole family.">
+        <DocList docs={records.documents}
+          onAdd={(name) => addListItem('documents', { name, size: '— KB', uploaded: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), by: FAMILY_USER.name })}
+          onRemove={(i) => removeListItem('documents', i)} />
+      </RecordSection>
+    </div>
+  );
+}
+
+function PageHeader({ title, sub }) {
+  return (
+    <div style={{ marginBottom: 28 }}>
+      <h1 style={{ fontFamily: 'var(--display)', fontSize: 44, letterSpacing: '-0.02em', lineHeight: 1.05, margin: 0, color: 'var(--ink)', fontWeight: 400 }}>{title}</h1>
+      {sub && <p style={{ fontSize: 15, color: 'var(--muted)', margin: '8px 0 0', maxWidth: 720 }}>{sub}</p>}
+    </div>
+  );
+}
+
+function SummaryStat({ big, label, sub, color }) {
+  return (
+    <div className="card" style={{ padding: 24 }}>
+      <div style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', fontWeight: 500 }}>{label}</div>
+      <div style={{ fontFamily: 'var(--display)', fontSize: 56, lineHeight: 1, color: color || 'var(--ink)', marginTop: 8, letterSpacing: '-0.02em' }}>{big}</div>
+      {sub && <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 6 }}>{sub}</div>}
+    </div>
+  );
+}
+
+function RecordSection({ icon, title, sub, children }) {
+  return (
+    <section style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 20, padding: 28, marginBottom: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 20 }}>
+        <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--cream)', color: 'var(--forest)', display: 'grid', placeItems: 'center', flexShrink: 0 }}>{icon}</div>
+        <div>
+          <h3 style={{ fontFamily: 'var(--display)', fontSize: 22, margin: 0, letterSpacing: '-0.01em', fontWeight: 400 }}>{title}</h3>
+          {sub && <p style={{ fontSize: 13, color: 'var(--muted)', margin: '4px 0 0', maxWidth: 560 }}>{sub}</p>}
+        </div>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>{children}</div>
+    </section>
+  );
+}
+
+function EditField({ label, value, onChange, hint, multiline }) {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 16, alignItems: hint || multiline ? 'flex-start' : 'center', padding: '6px 0' }}>
+      <label style={{ fontSize: 13, color: 'var(--muted)', paddingTop: multiline ? 8 : 0 }}>{label}</label>
+      <div>
+        {multiline ? (
+          <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={3}
+            style={{ width: '100%', padding: '10px 14px', borderRadius: 10, background: 'var(--cream)', border: '1px solid transparent', fontSize: 14, color: 'var(--ink)', outline: 'none', fontFamily: 'var(--sans)', lineHeight: 1.5, resize: 'vertical' }} />
+        ) : (
+          <input type="text" value={value} onChange={(e) => onChange(e.target.value)}
+            style={{ width: '100%', padding: '10px 14px', borderRadius: 10, background: 'var(--cream)', border: '1px solid transparent', fontSize: 14, color: 'var(--ink)', outline: 'none' }} />
+        )}
+        {hint && <div style={{ fontSize: 12, color: 'var(--muted-2)', marginTop: 4 }}>{hint}</div>}
+      </div>
+    </div>
+  );
+}
+
+function ListEditor({ items, fields, onUpdate, onRemove, onAdd, addLabel }) {
+  const sizes = { sm: '180px', md: '200px', lg: '1fr' };
+  const cols = fields.map(f => sizes[f.size] || '1fr').join(' ') + ' auto';
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {items.map((item, i) => (
+        <div key={i} style={{ display: 'grid', gridTemplateColumns: cols, gap: 10, alignItems: 'center' }}>
+          {fields.map(f => (
+            <input key={f.key} type="text" placeholder={f.placeholder} value={item[f.key] || ''} onChange={(e) => onUpdate(i, { ...item, [f.key]: e.target.value })}
+              style={{ padding: '10px 14px', borderRadius: 10, background: 'var(--cream)', border: '1px solid transparent', fontSize: 14, color: 'var(--ink)', outline: 'none', minWidth: 0 }} />
+          ))}
+          <button onClick={() => onRemove(i)} title="Remove" style={{ width: 32, height: 32, borderRadius: 8, color: 'var(--muted)', display: 'grid', placeItems: 'center' }}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--coral-bg)'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}><Icons.close /></button>
+        </div>
+      ))}
+      <button onClick={onAdd} style={{ alignSelf: 'flex-start', padding: '8px 14px', borderRadius: 999, fontSize: 13, color: 'var(--forest)', border: '1px dashed var(--line-2)', background: 'transparent', marginTop: 4 }}>+ {addLabel}</button>
+    </div>
+  );
+}
+
+function NotesEditor({ notes, onAdd, onRemove }) {
+  const [draft, setDraft] = useStateP('');
+  const submit = () => { if (!draft.trim()) return; onAdd(draft.trim()); setDraft(''); };
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ background: 'var(--cream)', borderRadius: 12, padding: 14 }}>
+        <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={3} placeholder="Add a note — something you noticed, a question to ask the doctor, an update for the family…"
+          style={{ width: '100%', padding: 8, border: 0, outline: 'none', background: 'transparent', fontFamily: 'var(--sans)', fontSize: 14, color: 'var(--ink)', resize: 'vertical', lineHeight: 1.55 }} />
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+          <button onClick={submit} disabled={!draft.trim()} style={{ padding: '8px 16px', borderRadius: 999, fontSize: 13, background: draft.trim() ? 'var(--forest)' : 'var(--cream-2)', color: draft.trim() ? 'var(--cream)' : 'var(--muted)', cursor: draft.trim() ? 'pointer' : 'default', transition: 'background .15s ease' }}>Post note</button>
+        </div>
+      </div>
+      {notes.map((n, i) => (
+        <div key={i} style={{ padding: 16, borderRadius: 12, background: 'var(--cream)', border: '1px solid var(--line)', display: 'grid', gridTemplateColumns: '1fr auto', gap: 16, alignItems: 'flex-start' }}>
+          <div><div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 6 }}>{n.author} · {n.date}</div><div style={{ fontSize: 14, color: 'var(--ink)', lineHeight: 1.55 }}>{n.text}</div></div>
+          <button onClick={() => onRemove(i)} title="Remove" style={{ color: 'var(--muted)', padding: 4 }}><Icons.close /></button>
+        </div>
+      ))}
+      {notes.length === 0 && (<div style={{ fontSize: 13, color: 'var(--muted)', textAlign: 'center', padding: '12px 0' }}>No notes yet. Add the first one above.</div>)}
+    </div>
+  );
+}
+
+function DocList({ docs, onAdd, onRemove }) {
+  const fileInputRef = React.useRef(null);
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {docs.map((d, i) => (
+        <div key={i} style={{ display: 'grid', gridTemplateColumns: '40px 1fr auto auto', gap: 14, alignItems: 'center', padding: '12px 14px', background: 'var(--cream)', borderRadius: 10 }}>
+          <div style={{ width: 32, height: 40, borderRadius: 4, background: 'var(--paper)', border: '1px solid var(--line)', display: 'grid', placeItems: 'center', fontSize: 9, color: 'var(--muted)', letterSpacing: '0.04em', fontWeight: 500 }}>PDF</div>
+          <div><div style={{ fontSize: 14, color: 'var(--ink)' }}>{d.name}</div><div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 2 }}>{d.size} · Uploaded {d.uploaded} by {d.by}</div></div>
+          <button style={{ padding: '6px 12px', borderRadius: 999, fontSize: 12, color: 'var(--forest)', border: '1px solid var(--line-2)' }}>View</button>
+          <button onClick={() => onRemove(i)} title="Remove" style={{ color: 'var(--muted)', padding: 4 }}><Icons.close /></button>
+        </div>
+      ))}
+      <input ref={fileInputRef} type="file" style={{ display: 'none' }}
+        onChange={(e) => { const f = e.target.files && e.target.files[0]; if (f) onAdd(f.name); e.target.value = ''; }} />
+      <button onClick={() => fileInputRef.current && fileInputRef.current.click()}
+        style={{ alignSelf: 'flex-start', padding: '10px 16px', borderRadius: 999, fontSize: 13, color: 'var(--forest)', border: '1px dashed var(--line-2)', background: 'transparent', marginTop: 4 }}>+ Upload document</button>
+    </div>
+  );
+}
+
+Object.assign(window, { CallsPage, MedicationsPage, RecordsPage });
+</script>
+<script type="text/babel">
+// App shell — mounts the dashboard directly.
+function App() { return <Dashboard onSignOut={() => { window.location.href = 'index.html'; }} />; }
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
