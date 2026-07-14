@@ -29,7 +29,7 @@ in `assets/`, not from a framework.
 | `index.html` | Home — the flowing scroll experience (hero → Eleanor's story → the gap → how it works → triage → why Brigid → dashboard preview → CTA) |
 | `how-it-works.html` | The daily call, the clinical tools behind it, the triage system, the dashboard |
 | `about.html` | Mission, Eleanor's story in full, values, and our origin at Queen's DDQIC |
-| `for-partners.html` | Market, revenue models, financial sustainability, roadmap, and "the ask" ($2,700) |
+| `for-partners.html` | The value case (cost of readmission), market size, and the commercialization roadmap |
 | `faq.html` | Common questions, in an accordion |
 | `contact.html` | Contact form (demo — see note below) and details |
 | `product.html` | The interactive family dashboard demo (React) |

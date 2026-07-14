@@ -68,15 +68,16 @@
     var suffix = el.getAttribute('data-suffix') || '';
     var prefix = el.getAttribute('data-prefix') || '';
     var decimals = (el.getAttribute('data-count').split('.')[1] || '').length;
-    if (reduceMotion) { el.textContent = prefix + target.toFixed(decimals) + suffix; return; }
+    var fmt = function (n) { return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }); };
+    if (reduceMotion) { el.textContent = prefix + fmt(target) + suffix; return; }
     var start = null, dur = 1500;
     function tick(ts) {
       if (start === null) start = ts;
       var p = Math.min((ts - start) / dur, 1);
       var eased = 1 - Math.pow(1 - p, 3);
-      el.textContent = prefix + (target * eased).toFixed(decimals) + suffix;
+      el.textContent = prefix + fmt(target * eased) + suffix;
       if (p < 1) requestAnimationFrame(tick);
-      else el.textContent = prefix + target.toFixed(decimals) + suffix;
+      else el.textContent = prefix + fmt(target) + suffix;
     }
     requestAnimationFrame(tick);
   }
