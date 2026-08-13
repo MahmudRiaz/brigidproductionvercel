@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Brigid — Nurse Station</title>
+<link rel="icon" href="assets/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --cream: #f5efe4; --cream-2: #ece3d2; --cream-3: #e2d6bf; --paper: #fbf7ee;
+    --ink: #11140f; --ink-2: #2c3329; --muted: #6c7062; --muted-2: #989a8c;
+    --forest: #1a3225; --forest-2: #234534; --forest-deep: #0f2419; --sage: #7c9879;
+    --sage-light: #c8d6c0; --sage-bg: #e3ead8;
+    --green: #4f7a4d; --green-bg: #d6e3cd;
+    --amber: #c89a3a; --amber-bg: #f0e3c2; --amber-ink: #7a5c00;
+    --coral: #d97757; --coral-bg: #f4d9cc; --coral-ink: #8a3517;
+    --line: rgba(26,50,37,0.10); --line-2: rgba(26,50,37,0.18);
+    --shadow-sm: 0 1px 2px rgba(26,50,37,0.05);
+    --shadow: 0 8px 30px -12px rgba(26,50,37,0.18);
+    --serif: 'Newsreader','Instrument Serif',Georgia,serif;
+    --display: 'Instrument Serif','Newsreader',Georgia,serif;
+    --sans: 'Geist',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    --ease: cubic-bezier(.2,.7,.2,1);
+  }
+  *{box-sizing:border-box;-webkit-font-smoothing:antialiased;margin:0;padding:0}
+  html,body{min-height:100vh;background:var(--cream);font-family:var(--sans);color:var(--ink);font-size:15px;line-height:1.5}
+  button{font:inherit;cursor:pointer;border:0;background:transparent;color:inherit}
+  input,select{font:inherit}
+  ::selection{background:var(--forest);color:var(--cream)}
+
+  /* ── Nav ───────────────────────────────────────────────── */
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 32px;background:rgba(245,239,228,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40}
+  .nav-left{display:flex;align-items:center;gap:16px}
+  .logo{font-family:var(--display);font-size:26px;color:var(--forest);letter-spacing:-0.02em;font-style:italic;line-height:1}
+  .nav-tag{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);background:var(--cream-2);padding:5px 11px;border-radius:999px;font-weight:500}
+  .nav-right{display:flex;align-items:center;gap:14px}
+  .nav-date{font-size:13px;color:var(--muted)}
+  .user{display:flex;align-items:center;gap:10px;padding:5px 14px 5px 5px;background:var(--cream-2);border-radius:999px}
+  .user .av{width:30px;height:30px;border-radius:50%;background:var(--forest);color:var(--cream);display:grid;place-items:center;font-size:12px;font-weight:600}
+  .user .nm{font-size:13px;line-height:1.15}
+  .user .nm span{display:block;font-size:11px;color:var(--muted)}
+
+  .main{max-width:1280px;margin:0 auto;padding:32px 32px 96px}
+
+  /* ── Page head ─────────────────────────────────────────── */
+  .eyebrow{font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--sage);font-weight:600}
+  .page-title{font-family:var(--display);font-size:clamp(34px,4.4vw,48px);line-height:1.03;letter-spacing:-0.025em;margin:10px 0 6px;font-weight:400}
+  .page-sub{font-size:15px;color:var(--muted);max-width:640px}
+
+  /* ── Caseload stat strip ───────────────────────────────── */
+  .stat-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:28px 0 26px}
+  .stat{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px 20px;position:relative;overflow:hidden;text-align:left;transition:border-color .15s var(--ease),transform .15s var(--ease)}
+  .stat:hover{border-color:var(--line-2);transform:translateY(-1px)}
+  .stat.on{border-color:var(--forest);box-shadow:0 0 0 1px var(--forest)}
+  .stat .sl{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .stat .sv{font-family:var(--display);font-size:38px;line-height:1;letter-spacing:-0.02em;margin-top:8px}
+  .stat .sd{font-size:12px;color:var(--muted-2);margin-top:5px}
+  .stat.acc-green .sv{color:var(--green)}
+  .stat.acc-amber .sv{color:var(--amber)}
+  .stat.acc-coral .sv{color:var(--coral)}
+
+  /* ── Toolbar ───────────────────────────────────────────── */
+  .toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+  .search{flex:1;min-width:200px;max-width:320px;position:relative}
+  .search input{width:100%;padding:10px 16px 10px 38px;border-radius:999px;background:var(--paper);border:1px solid var(--line-2);font-size:14px;color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s}
+  .search input:focus{border-color:var(--forest);box-shadow:0 0 0 3px var(--sage-bg)}
+  .search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted-2)}
+  .sortsel{padding:10px 16px;border-radius:999px;background:var(--paper);border:1px solid var(--line-2);font-size:14px;color:var(--ink-2);outline:none;cursor:pointer}
+  .sortsel:focus{border-color:var(--forest)}
+  .count{font-size:13px;color:var(--muted);margin-left:auto}
+
+  /* ── Patient roster ────────────────────────────────────── */
+  .roster{display:flex;flex-direction:column;gap:12px}
+  .prow{width:100%;text-align:left;background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:18px;padding:18px 22px;display:grid;grid-template-columns:minmax(230px,1.5fr) auto 1fr auto;gap:22px;align-items:center;transition:transform .16s var(--ease),box-shadow .16s var(--ease),border-color .16s var(--ease)}
+  .prow:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--line-2)}
+  .prow.s-well{border-left-color:var(--green)}
+  .prow.s-watch{border-left-color:var(--amber)}
+  .prow.s-alert{border-left-color:var(--coral)}
+
+  .pid{display:flex;align-items:center;gap:14px;min-width:0}
+  .avatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--forest),var(--sage));color:var(--cream);display:grid;place-items:center;font-family:var(--display);font-size:17px;flex-shrink:0}
+  .pname{font-family:var(--display);font-size:22px;line-height:1.1;letter-spacing:-0.015em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pmeta{font-size:12.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  .pstatus{display:flex;flex-direction:column;align-items:flex-start;gap:7px}
+  .chip{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap}
+  .chip.well{background:var(--green-bg);color:var(--green)}
+  .chip.watch{background:var(--amber-bg);color:var(--amber-ink)}
+  .chip.alert{background:var(--coral-bg);color:var(--coral-ink)}
+  .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .dot.well{background:var(--green)} .dot.watch{background:var(--amber)} .dot.alert{background:var(--coral)}
+  .lastcall{font-size:11.5px;color:var(--muted)}
+  .lastcall.stale{color:var(--coral);font-weight:500}
+
+  .pmetrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+  .pm{text-align:center;padding:0 4px}
+  .pm .k{font-size:9.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted-2);font-weight:600}
+  .pm .v{font-family:var(--display);font-size:20px;line-height:1.1;margin-top:3px;color:var(--ink)}
+  .pm .v small{font-size:11px;color:var(--muted)}
+  .pm .v.warn{color:var(--amber)}
+  .pm .v.bad{color:var(--coral)}
+
+  .pright{display:flex;align-items:center;gap:16px}
+  .minigrid{display:grid;grid-auto-flow:column;grid-auto-columns:8px;gap:3px;justify-content:end;width:151px}
+  .minigrid i{height:8px;border-radius:2px;display:block}
+  .chev{color:var(--muted-2);flex-shrink:0;transition:transform .16s var(--ease)}
+  .prow:hover .chev{transform:translateX(3px);color:var(--forest)}
+
+  .flagline{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:7px;margin-top:2px;padding-top:14px;border-top:1px dashed var(--line-2)}
+  .ftag{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 10px;border-radius:8px;background:var(--amber-bg);color:var(--amber-ink);font-weight:500}
+  .ftag.hot{background:var(--coral-bg);color:var(--coral-ink)}
+
+  .empty{padding:60px 20px;text-align:center;color:var(--muted);font-size:15px;background:var(--paper);border:1px dashed var(--line-2);border-radius:18px}
+
+  /* ── Detail view ───────────────────────────────────────── */
+  .back{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--forest);font-weight:500;padding:8px 14px 8px 10px;border-radius:999px;margin-bottom:22px;transition:background .15s}
+  .back:hover{background:rgba(26,50,37,.06)}
+
+  .dhead{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:28px 32px;display:grid;grid-template-columns:1fr auto;gap:26px;align-items:start;margin-bottom:20px}
+  .dhead .who{display:flex;gap:18px;align-items:center}
+  .dhead .avatar{width:64px;height:64px;font-size:24px}
+  .dhead h2{font-family:var(--display);font-size:36px;line-height:1.04;letter-spacing:-0.025em;font-weight:400}
+  .dhead .sub{font-size:13.5px;color:var(--muted);margin-top:4px}
+  .dfacts{display:grid;grid-template-columns:repeat(4,auto);gap:0;margin-top:22px;grid-column:1/-1;border-top:1px solid var(--line);padding-top:18px}
+  .dfact{padding-right:28px;margin-right:28px;border-right:1px solid var(--line)}
+  .dfact:last-child{border-right:0;padding-right:0;margin-right:0}
+  .dfact .k{font-size:10.5px;letter-spacing:0.11em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .dfact .v{font-family:var(--display);font-size:19px;margin-top:3px;line-height:1.2}
+  .dactions{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;background:var(--forest);color:var(--cream);font-size:13.5px;font-weight:500;transition:background .15s,transform .15s;white-space:nowrap}
+  .btn:hover{background:var(--forest-2);transform:translateY(-1px)}
+  .btn.ghost{background:transparent;color:var(--forest);border:1px solid var(--line-2)}
+  .btn.ghost:hover{background:rgba(26,50,37,.05)}
+
+  .alertbar{border-radius:16px;padding:18px 22px;margin-bottom:20px;display:flex;gap:14px;align-items:flex-start}
+  .alertbar.watch{background:var(--amber-bg);color:var(--amber-ink)}
+  .alertbar.alert{background:var(--coral-bg);color:var(--coral-ink)}
+  .alertbar h4{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+  .alertbar ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+  .alertbar li{font-size:14px;display:flex;gap:9px;align-items:flex-start;line-height:1.5}
+  .alertbar li::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;margin-top:7px;opacity:.6}
+
+  .sechead{display:flex;align-items:baseline;justify-content:space-between;margin:32px 0 14px;gap:16px}
+  .sechead h3{font-family:var(--display);font-size:25px;letter-spacing:-0.015em;font-weight:400}
+  .sechead .note{font-size:12.5px;color:var(--muted)}
+
+  /* ── Expandable metric boxes ───────────────────────────── */
+  .mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .mbox{background:var(--paper);border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:border-color .16s var(--ease),box-shadow .16s var(--ease)}
+  .mbox.open{border-color:var(--line-2);box-shadow:var(--shadow);grid-column:1/-1}
+  .mtop{width:100%;text-align:left;padding:20px 22px;display:block;transition:background .14s}
+  .mtop:hover{background:rgba(26,50,37,.022)}
+  .mlabel{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:0.13em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .mlabel svg{color:var(--sage)}
+  .mval{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-top:12px}
+  .mnum{font-family:var(--display);font-size:42px;line-height:1;letter-spacing:-0.025em}
+  .mnum small{font-size:16px;color:var(--muted);margin-left:2px}
+  .mnum.warn{color:var(--amber)} .mnum.bad{color:var(--coral)} .mnum.good{color:var(--green)}
+  .mspark{flex-shrink:0}
+  .mfoot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
+  .mdelta{font-size:12.5px;display:inline-flex;align-items:center;gap:5px;color:var(--muted)}
+  .mdelta.up{color:var(--green)} .mdelta.down{color:var(--coral)}
+  .mtoggle{font-size:12px;color:var(--forest);display:inline-flex;align-items:center;gap:5px;font-weight:500;opacity:.75}
+  .mtop:hover .mtoggle{opacity:1}
+  .mtoggle svg{transition:transform .2s var(--ease)}
+  .mbox.open .mtoggle svg{transform:rotate(180deg)}
+  .mbody{max-height:0;overflow:hidden;transition:max-height .35s var(--ease)}
+  .mbody-in{padding:4px 22px 24px;border-top:1px solid var(--line)}
+  .chartwrap{margin:18px 0 4px;overflow-x:auto}
+  .xaxis{display:flex;justify-content:space-between;font-size:11px;color:var(--muted-2);padding:6px 2px 0}
+  .mref{background:var(--cream);border-left:3px solid var(--sage);border-radius:10px;padding:13px 16px;font-size:13.5px;line-height:1.6;color:var(--ink-2);margin-top:16px}
+  .mref b{font-weight:600;color:var(--ink)}
+  .mref .lbl{display:block;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--sage);font-weight:700;margin-bottom:4px}
+  .statrow{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:16px}
+  .ministat{background:var(--cream);border-radius:12px;padding:13px 15px}
+  .ministat .k{font-size:10px;letter-spacing:0.11em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .ministat .v{font-family:var(--display);font-size:22px;margin-top:3px;line-height:1.1}
+
+  /* Med adherence bars */
+  .medrow{display:grid;grid-template-columns:1.4fr 2.6fr auto;gap:14px;align-items:center;padding:11px 0;border-top:1px solid var(--line)}
+  .medrow:first-child{border-top:0}
+  .medname{font-size:14px}
+  .medname span{display:block;font-size:11.5px;color:var(--muted);margin-top:1px}
+  .track{height:8px;border-radius:999px;background:var(--cream-2);overflow:hidden}
+  .fill{height:100%;border-radius:999px;transition:width .7s var(--ease)}
+  .medpct{font-family:var(--display);font-size:18px;text-align:right;min-width:56px}
+
+  /* Function task grid */
+  .taskgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:4px}
+  .task{display:grid;grid-template-columns:auto 1fr auto;gap:11px;align-items:center;padding:11px 14px;border-radius:11px;background:var(--cream)}
+  .task .tn{font-size:13.5px}
+  .task .td{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .tbadge{font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap}
+  .tbadge.ind{background:var(--green-bg);color:var(--green)}
+  .tbadge.help{background:var(--amber-bg);color:var(--amber-ink)}
+
+  /* Call log */
+  .calls{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:8px 22px 14px}
+  .call{display:grid;grid-template-columns:82px 1fr auto;gap:16px;padding:15px 0;border-top:1px solid var(--line);align-items:start}
+  .call:first-child{border-top:0}
+  .call .when .d{font-family:var(--display);font-size:16px;line-height:1.1}
+  .call .when .t{font-size:11px;color:var(--muted);margin-top:2px}
+  .call .ttl{font-size:14px;display:flex;align-items:center;gap:8px;line-height:1.4}
+  .call .snip{font-size:13px;color:var(--ink-2);line-height:1.55;margin-top:4px}
+  .call .vals{font-size:11.5px;color:var(--muted);margin-top:6px;display:flex;gap:14px;flex-wrap:wrap}
+  .call .dur{font-size:11.5px;color:var(--muted-2);white-space:nowrap;text-align:right}
+  .call.missed .ttl{color:var(--coral)}
+
+  @media(max-width:1080px){
+    .stat-strip{grid-template-columns:repeat(3,1fr)}
+    .prow{grid-template-columns:1fr auto;gap:16px}
+    .pmetrics{grid-column:1/-1;grid-template-columns:repeat(5,1fr);padding-top:14px;border-top:1px dashed var(--line-2)}
+    .pright{grid-column:1/-1;justify-content:space-between;padding-top:12px;border-top:1px dashed var(--line-2)}
+    .minigrid{width:100%}
+    .mgrid{grid-template-columns:repeat(2,1fr)}
+    .dfacts{grid-template-columns:repeat(2,1fr);gap:16px}
+    .dfact{border-right:0;padding-right:0;margin-right:0}
+  }
+  @media(max-width:720px){
+    .nav{padding:14px 18px}
+    .nav-date{display:none}
+    .main{padding:24px 18px 70px}
+    .stat-strip{grid-template-columns:repeat(2,1fr)}
+    .mgrid{grid-template-columns:1fr}
+    .statrow{grid-template-columns:repeat(2,1fr)}
+    .taskgrid{grid-template-columns:1fr}
+    .dhead{grid-template-columns:1fr;padding:22px}
+    .dactions{flex-direction:row;align-items:center}
+    .pmetrics{grid-template-columns:repeat(3,1fr);gap:10px}
+    .call{grid-template-columns:1fr;gap:6px}
+    .call .dur{text-align:left}
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-left">
+    <a href="index.html" class="logo">Brigid</a>
+    <span class="nav-tag">Nurse Station</span>
+  </div>
+  <div class="nav-right">
+    <span class="nav-date" id="nav-date"></span>
+    <div class="user">
+      <div class="av">SC</div>
+      <div class="nm">Sarah Chen, RN<span>Post-op recovery · KGH</span></div>
+    </div>
+  </div>
+</nav>
+
+<main class="main" id="app"></main>
+
+<script>
+/* ============================================================================
+   Brigid — Nurse Station
+   Objective metrics only. Every number shown is something the patient reported
+   on a call or that we counted directly (doses, answered calls, tasks). No
+   derived or composite "recovery scores".
+   ========================================================================== */
+
+/* ── Deterministic series generator (demo data only) ────────────────────── */
+function series(len, from, to, jitter, seed, dec, lo, hi) {
+  let s = seed >>> 0;
+  const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+  const out = [];
+  for (let i = 0; i < len; i++) {
+    const t = len === 1 ? 1 : i / (len - 1);
+    let v = from + (to - from) * t + (rnd() - 0.5) * 2 * jitter;
+    if (lo != null) v = Math.max(lo, v);
+    if (hi != null) v = Math.min(hi, v);
+    out.push(Number(v.toFixed(dec)));
+  }
+  return out;
+}
+
+/* ── Caseload ───────────────────────────────────────────────────────────── */
+const RAW = [
+  { id:'p1', first:'Eleanor', last:'Ward', age:78, procedure:'Right total hip replacement',
+    surgery:'Apr 24, 2026', pod:12, phone:'(613) 555-0142', surgeon:'Dr. S. Chen',
+    pain:[6,5,5,4,4,4,3,3,3,3,2,3,2,2], sleep:[5.2,5.8,6.0,6.2,6.5,6.4,6.8,7.0,7.2,6.9,7.1,7.3,7.5,7.4],
+    mood:[3,3,4,3,4,4,4,4,5,4,4,4,5,5], missedDoseDays:[3,11], fallDays:[], missedCallDays:[],
+    doses:{taken:63,total:66},
+    meds:[
+      {n:'Apixaban',d:'2.5 mg · 2× daily',p:'Anticoagulant',taken:23,total:24},
+      {n:'Acetaminophen',d:'500 mg · PRN',p:'Analgesic',taken:17,total:18},
+      {n:'Ferrous sulfate',d:'325 mg · daily',p:'Iron supplement',taken:12,total:12},
+      {n:'Pantoprazole',d:'40 mg · daily',p:'Gastric protection',taken:11,total:12}],
+    tasks:[['Eating meals','ind','Independent'],['Getting dressed','ind','Independent'],
+           ['Bathing','ind','Uses shower seat'],['Walking indoors','ind','Cane for distance'],
+           ['Climbing stairs','help','Needs handrail + supervision'],['Bed transfers','help','Assist in mornings']],
+    calls:[
+      ['Today','9:14 am','6:24','well','Pain 2/10, all doses confirmed','Walked to kitchen unassisted, prepared own breakfast. Slept 7.4 h. All four medications confirmed taken.',2,7.4,5,'All taken'],
+      ['Mon','9:08 am','5:51','well','Longest sleep since surgery','Slept 7.3 h. Pain 3/10. Reported mild constipation — advised fluids and fibre.',3,7.3,5,'All taken'],
+      ['Sun','9:01 am','6:02','well','Ambulated outdoors','Pain 3/10. Walked to porch with daughter present.',3,6.9,4,'All taken'],
+      ['Sat','9:10 am','7:18','watch','Evening pantoprazole missed','Patient forgot evening dose. Reinforced schedule; reminder set.',3,7.2,4,'1 missed'],
+      ['Fri','9:03 am','5:44','well','Lab appointment confirmed','Pain 4/10. Transport to lab arranged with daughter.',4,7.0,4,'All taken']] },
+
+  { id:'p2', first:'Harold', last:'Bennett', age:71, procedure:'CABG ×3',
+    surgery:'Apr 28, 2026', pod:8, phone:'(613) 555-0177', surgeon:'Dr. R. Patel',
+    pain:[7,6,6,7,6,7,6,7], sleep:[4.8,5.1,4.6,4.4,5.0,4.2,4.5,4.1],
+    mood:[3,3,2,2,3,2,2,2], missedDoseDays:[2,4,5,7], fallDays:[], missedCallDays:[],
+    doses:{taken:31,total:40},
+    meds:[
+      {n:'Metoprolol',d:'25 mg · 2× daily',p:'Beta blocker',taken:11,total:16},
+      {n:'Atorvastatin',d:'40 mg · nightly',p:'Statin',taken:6,total:8},
+      {n:'ASA',d:'81 mg · daily',p:'Antiplatelet',taken:8,total:8},
+      {n:'Hydromorphone',d:'1 mg · PRN',p:'Analgesic',taken:6,total:8}],
+    tasks:[['Eating meals','ind','Reduced portions'],['Getting dressed','help','Wife assists'],
+           ['Bathing','help','Sponge bath only'],['Walking indoors','help','Two-person assist'],
+           ['Climbing stairs','help','Not attempted since discharge'],['Bed transfers','help','Full assist']],
+    calls:[
+      ['Today','9:22 am','8:41','alert','Pain 7/10, third missed beta blocker this week','Sternal pain 7/10, worse on deep breath. Slept 4.1 h. Reports skipping evening metoprolol again — states it "makes him dizzy". Escalated to care team.',7,4.1,2,'2 missed'],
+      ['Mon','9:18 am','7:12','alert','Sleep under 5 h for fourth night','Pain 6/10. Slept 4.5 h. Low mood, short answers. Denies chest pressure at rest.',6,4.5,2,'1 missed'],
+      ['Sun','9:15 am','6:38','alert','Missed statin and metoprolol','Pain 7/10. Reports poor appetite. Two evening doses missed.',7,4.2,2,'2 missed'],
+      ['Sat','9:11 am','5:59','watch','Pain elevated, sleep poor','Pain 6/10. Slept 5.0 h. Mood flat but engaged.',6,5.0,3,'All taken'],
+      ['Fri','9:20 am','6:44','alert','Missed evening doses','Pain 7/10 with movement. Two doses missed. Wife reports he is reluctant to take opioid.',7,4.4,2,'2 missed']] },
+
+  { id:'p3', first:'Margaret', last:'Osei', age:83, procedure:'Left total knee replacement',
+    surgery:'May 1, 2026', pod:5, phone:'(613) 555-0119', surgeon:'Dr. S. Chen',
+    pain:[7,6,5,5,4], sleep:[5.0,5.4,5.6,6.0,5.9],
+    mood:[3,3,3,4,4], missedDoseDays:[1], fallDays:[], missedCallDays:[],
+    doses:{taken:18,total:20},
+    meds:[
+      {n:'Rivaroxaban',d:'10 mg · daily',p:'Anticoagulant',taken:5,total:5},
+      {n:'Acetaminophen',d:'1 g · QID',p:'Analgesic',taken:9,total:10},
+      {n:'Naproxen',d:'250 mg · 2× daily',p:'Anti-inflammatory',taken:4,total:5}],
+    tasks:[['Eating meals','ind','Independent'],['Getting dressed','help','Needs help with socks'],
+           ['Bathing','help','Daughter assists'],['Walking indoors','ind','Walker, short distances'],
+           ['Climbing stairs','help','Not yet attempted'],['Bed transfers','ind','Slow but independent']],
+    calls:[
+      ['Today','9:31 am','6:12','watch','Pain improving, still on walker','Pain 4/10, down from 7 on POD 1. Slept 5.9 h. Walking to bathroom with walker. All doses confirmed.',4,5.9,4,'All taken'],
+      ['Mon','9:28 am','6:50','watch','First full night over 6 h','Pain 5/10. Slept 6.0 h. Mood improved. Physio home visit completed.',5,6.0,4,'All taken'],
+      ['Sun','9:26 am','7:04','watch','Pain 5/10, sleep improving','Pain 5/10. Slept 5.6 h. Ambulating in hallway with walker.',5,5.6,3,'All taken'],
+      ['Sat','9:24 am','7:33','watch','One naproxen dose missed','Pain 6/10. Missed evening naproxen. Reinforced schedule.',6,5.4,3,'1 missed'],
+      ['Fri','9:30 am','8:02','watch','First post-discharge call','Pain 7/10. Slept 5.0 h. Orientation to daily check-ins completed.',7,5.0,3,'All taken']] },
+
+  { id:'p4', first:'Robert', last:'Kowalski', age:69, procedure:'L4–L5 spinal fusion',
+    surgery:'Apr 17, 2026', pod:19, phone:'(613) 555-0163', surgeon:'Dr. M. Alvarez',
+    pain:[6,6,5,5,4,4,4,3,3,3,3,2,2,2], sleep:[5.5,5.9,6.2,6.4,6.6,6.8,7.0,7.1,7.3,7.2,7.4,7.6,7.5,7.7],
+    mood:[3,4,4,4,4,4,5,4,5,5,4,5,5,5], missedDoseDays:[], fallDays:[], missedCallDays:[],
+    doses:{taken:42,total:42},
+    meds:[
+      {n:'Gabapentin',d:'300 mg · 3× daily',p:'Neuropathic pain',taken:42,total:42}],
+    tasks:[['Eating meals','ind','Independent'],['Getting dressed','ind','Uses reacher'],
+           ['Bathing','ind','Independent'],['Walking indoors','ind','No aid'],
+           ['Climbing stairs','ind','Slow, no assist'],['Bed transfers','ind','Log-roll technique']],
+    calls:[
+      ['Today','8:52 am','4:31','well','Pain 2/10, full independence','Pain 2/10. Slept 7.7 h. Independent with all six daily tasks. Walked 20 min outdoors.',2,7.7,5,'All taken'],
+      ['Mon','8:49 am','4:48','well','Independent on stairs','Pain 2/10. Slept 7.5 h. Managed full flight of stairs unassisted.',2,7.5,5,'All taken'],
+      ['Sun','8:55 am','5:02','well','Steady, no concerns','Pain 2/10. Slept 7.6 h. No new symptoms.',2,7.6,5,'All taken'],
+      ['Sat','8:47 am','4:56','well','Returned to driving assessment','Pain 3/10. Slept 7.4 h. Asked about return-to-work timeline.',3,7.4,4,'All taken'],
+      ['Fri','8:53 am','5:20','well','Routine — improving','Pain 3/10. Slept 7.2 h.',3,7.2,5,'All taken']] },
+
+  { id:'p5', first:'Doris', last:'Lam', age:88, procedure:'Hip fracture ORIF',
+    surgery:'May 3, 2026', pod:3, phone:'(613) 555-0198', surgeon:'Dr. S. Chen',
+    pain:[8,7,6], sleep:[4.2,4.9,5.2], mood:[2,3,3],
+    missedDoseDays:[], fallDays:[], missedCallDays:[],
+    doses:{taken:11,total:12},
+    meds:[
+      {n:'Enoxaparin',d:'40 mg · daily SC',p:'Anticoagulant',taken:3,total:3},
+      {n:'Acetaminophen',d:'1 g · QID',p:'Analgesic',taken:5,total:6},
+      {n:'Docusate',d:'100 mg · 2× daily',p:'Stool softener',taken:3,total:3}],
+    tasks:[['Eating meals','help','Needs setup'],['Getting dressed','help','Full assist'],
+           ['Bathing','help','Bed bath'],['Walking indoors','help','Two-person, walker'],
+           ['Climbing stairs','help','Not attempted'],['Bed transfers','help','Full assist']],
+    calls:[
+      ['Today','10:04 am','7:55','watch','Pain 6/10, early recovery','Pain 6/10 on movement. Slept 5.2 h. Requires full assist for transfers — expected at POD 3. Daughter present during call.',6,5.2,3,'All taken'],
+      ['Mon','10:01 am','8:22','watch','Sleep improving slightly','Pain 7/10. Slept 4.9 h. One acetaminophen dose missed overnight.',7,4.9,3,'1 missed'],
+      ['Sun','9:58 am','9:14','alert','First call — pain 8/10','Discharge day call. Pain 8/10. Slept 4.2 h. Low mood. Home supports confirmed.',8,4.2,2,'All taken']] },
+
+  { id:'p6', first:'Frank', last:'Delaney', age:74, procedure:'TURP',
+    surgery:'Apr 21, 2026', pod:15, phone:'(613) 555-0134', surgeon:'Dr. K. Osei',
+    pain:[4,4,3,3,3,2,2,2,2,1,2,1,1,1], sleep:[5.8,6.1,6.3,6.5,6.4,6.8,7.0,6.9,7.2,7.1,7.3,7.2,7.4,7.3],
+    mood:[3,4,4,4,4,5,4,5,5,5,5,4,5,5], missedDoseDays:[6], fallDays:[], missedCallDays:[],
+    doses:{taken:27,total:28},
+    meds:[
+      {n:'Tamsulosin',d:'0.4 mg · daily',p:'Alpha blocker',taken:14,total:14},
+      {n:'Ciprofloxacin',d:'500 mg · 2× daily',p:'Antibiotic',taken:13,total:14}],
+    tasks:[['Eating meals','ind','Independent'],['Getting dressed','ind','Independent'],
+           ['Bathing','ind','Independent'],['Walking indoors','ind','No aid'],
+           ['Climbing stairs','ind','No assist'],['Bed transfers','ind','Independent']],
+    calls:[
+      ['Today','9:41 am','4:12','well','Pain 1/10, fully independent','Pain 1/10. Slept 7.3 h. No haematuria reported. Independent with all daily tasks.',1,7.3,5,'All taken'],
+      ['Mon','9:38 am','4:25','well','No new symptoms','Pain 1/10. Slept 7.4 h. Antibiotic course on track.',1,7.4,5,'All taken'],
+      ['Sun','9:44 am','4:38','well','Routine check','Pain 1/10. Slept 7.2 h.',1,7.2,4,'All taken'],
+      ['Sat','9:36 am','4:50','well','Steady','Pain 2/10. Slept 7.3 h.',2,7.3,5,'All taken'],
+      ['Fri','9:40 am','5:03','well','Improving steadily','Pain 1/10. Slept 7.1 h.',1,7.1,5,'All taken']] },
+
+  { id:'p7', first:'Anita', last:'Sharma', age:66, procedure:'Laparoscopic cholecystectomy',
+    surgery:'Apr 30, 2026', pod:6, phone:'(613) 555-0155', surgeon:'Dr. M. Alvarez',
+    pain:[5,4,4,3,3,2], sleep:[5.6,6.0,6.3,6.6,6.8,7.0], mood:[3,4,4,4,5,5],
+    missedDoseDays:[], fallDays:[], missedCallDays:[],
+    doses:{taken:17,total:18},
+    meds:[
+      {n:'Acetaminophen',d:'1 g · QID',p:'Analgesic',taken:11,total:12},
+      {n:'Ondansetron',d:'4 mg · PRN',p:'Antiemetic',taken:6,total:6}],
+    tasks:[['Eating meals','ind','Low-fat diet'],['Getting dressed','ind','Independent'],
+           ['Bathing','ind','Independent'],['Walking indoors','ind','No aid'],
+           ['Climbing stairs','ind','Independent'],['Bed transfers','ind','Mild discomfort']],
+    calls:[
+      ['Today','10:12 am','4:44','well','Pain 2/10, tolerating diet','Pain 2/10. Slept 7.0 h. Tolerating low-fat diet without nausea. Port sites clean and dry.',2,7.0,5,'All taken'],
+      ['Mon','10:09 am','5:01','well','Nausea resolved','Pain 3/10. Slept 6.8 h. No further antiemetic needed.',3,6.8,5,'All taken'],
+      ['Sun','10:15 am','5:22','well','Steady recovery','Pain 3/10. Slept 6.6 h.',3,6.6,4,'All taken'],
+      ['Sat','10:07 am','5:40','well','Mild shoulder-tip pain','Pain 4/10, referred shoulder pain — explained as expected post-laparoscopy.',4,6.3,4,'All taken']] },
+
+  { id:'p8', first:'George', last:'Mbeki', age:79, procedure:'Open AAA repair',
+    surgery:'Apr 26, 2026', pod:10, phone:'(613) 555-0171', surgeon:'Dr. R. Patel',
+    pain:[7,6,6,5,5,5,6,5,5,5], sleep:[4.9,5.2,5.5,5.7,5.4,5.6,5.1,5.5,5.3,5.4],
+    mood:[3,3,3,4,3,3,3,3,3,3], missedDoseDays:[6], fallDays:[4], missedCallDays:[8,9],
+    doses:{taken:34,total:36},
+    meds:[
+      {n:'Bisoprolol',d:'5 mg · daily',p:'Beta blocker',taken:9,total:10},
+      {n:'ASA',d:'81 mg · daily',p:'Antiplatelet',taken:10,total:10},
+      {n:'Atorvastatin',d:'80 mg · nightly',p:'Statin',taken:9,total:10},
+      {n:'Acetaminophen',d:'1 g · TID',p:'Analgesic',taken:6,total:6}],
+    tasks:[['Eating meals','ind','Independent'],['Getting dressed','help','Needs help with lower body'],
+           ['Bathing','help','Shower chair + supervision'],['Walking indoors','help','Walker, supervised'],
+           ['Climbing stairs','help','Not attempted since fall'],['Bed transfers','help','Standby assist']],
+    calls:[
+      ['Today','—','—','missed','No answer — second consecutive missed call','Two voicemails left. Emergency contact (son, James) notified by SMS. Requires nurse follow-up call today.',null,null,null,'Unconfirmed'],
+      ['Mon','—','—','missed','No answer','Voicemail left. No return call.',null,null,null,'Unconfirmed'],
+      ['Sun','9:47 am','7:29','watch','Pain 5/10, one dose missed','Pain 5/10. Slept 5.5 h. Missed evening statin.',5,5.5,3,'1 missed'],
+      ['Sat','9:44 am','8:56','alert','Reported fall in bathroom, no injury','Patient reports slipping in bathroom two days ago. No injury, got up unassisted. Advised on grab bars; OT referral placed.',6,5.1,3,'All taken'],
+      ['Fri','9:50 am','7:11','watch','Pain persistent at 5/10','Pain 5/10 at incision. Slept 5.6 h.',5,5.6,3,'All taken']] }
+];
+
+/* ── Derive objective status per day ────────────────────────────────────── */
+function dayStatus(p, i) {
+  if (p.missedCallDays.includes(i)) return 'alert';
+  if (p.fallDays.includes(i)) return 'alert';
+  const pain = p.pain[i], sleep = p.sleep[i], mood = p.mood[i];
+  if (pain >= 7) return 'alert';
+  if (pain >= 5 || sleep < 5 || mood <= 2 || p.missedDoseDays.includes(i)) return 'watch';
+  return 'well';
+}
+
+const PATIENTS = RAW.map(p => {
+  const n = p.pain.length;
+  const trend = p.pain.map((_, i) => dayStatus(p, i));
+  const status = trend[n - 1];
+  const adhPct = Math.round(p.doses.taken / p.doses.total * 100);
+  const indep = p.tasks.filter(t => t[1] === 'ind').length;
+  const answered = n - p.missedCallDays.length;
+
+  const flags = [];
+  if (p.missedCallDays.length) flags.push(['hot', `${p.missedCallDays.length} missed call${p.missedCallDays.length>1?'s':''} — unreachable`]);
+  if (p.fallDays.length) flags.push(['hot', `${p.fallDays.length} fall reported in last ${n} days`]);
+  if (p.pain[n-1] >= 7) flags.push(['hot', `Pain ${p.pain[n-1]}/10 — at or above escalation threshold`]);
+  else if (p.pain[n-1] >= 5) flags.push(['', `Pain ${p.pain[n-1]}/10 — above target`]);
+  if (adhPct < 85) flags.push(['hot', `Medication adherence ${adhPct}% — ${p.doses.total - p.doses.taken} doses missed`]);
+  else if (p.doses.total - p.doses.taken > 0) flags.push(['', `${p.doses.total - p.doses.taken} dose${p.doses.total-p.doses.taken>1?'s':''} missed in last ${n} days`]);
+  const sleepAvg3 = p.sleep.slice(-3).reduce((a,b)=>a+b,0) / Math.min(3, n);
+  if (sleepAvg3 < 5) flags.push(['hot', `Sleep averaging ${sleepAvg3.toFixed(1)} h over last 3 nights`]);
+  if (p.mood[n-1] <= 2) flags.push(['', `Mood scored ${p.mood[n-1]}/5 — low affect on call`]);
+
+  return Object.assign({}, p, {
+    name: p.first + ' ' + p.last,
+    initials: p.first[0] + p.last[0],
+    days: n, trend, status, adhPct, indep, answered, flags,
+    lastPain: p.pain[n-1], lastSleep: p.sleep[n-1], lastMood: p.mood[n-1],
+    lastContact: p.missedCallDays.includes(n-1) ? null : p.calls[0][1]
+  });
+});
+
+/* ── Shared bits ────────────────────────────────────────────────────────── */
+const MOOD_LABEL = {1:'Down',2:'Low',3:'Quiet',4:'Okay',5:'Bright'};
+const STATUS_LABEL = {well:'Stable', watch:'Monitor', alert:'Needs review'};
+const CSS = getComputedStyle(document.documentElement);
+const C = k => CSS.getPropertyValue(k).trim();
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ICON = {
+  pain:'<path d="M3 12h4l3-9 4 18 3-9h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  sleep:'<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+  mood:'<path d="M12 3v3M12 18v3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M3 12h3M18 12h3M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+  pill:'<rect x="3.5" y="8" width="17" height="8" rx="4" transform="rotate(-45 12 12)" stroke="currentColor" stroke-width="1.6"/><path d="M14.5 9.5l-5 5" stroke="currentColor" stroke-width="1.6"/>',
+  walk:'<circle cx="13" cy="4" r="2" stroke="currentColor" stroke-width="1.6"/><path d="m4 22 5-9 4 2 3-5 4 4M10 13 6 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+  phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'
+};
+const ic = (k, sz) => `<svg width="${sz||14}" height="${sz||14}" viewBox="0 0 24 24" fill="none">${ICON[k]}</svg>`;
+const chev = d => `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="${d==='down'?'m6 9 6 6 6-6':'m9 6 6 6-6 6'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const statusFill = { well: C('--green-bg'), watch: C('--amber-bg'), alert: C('--coral-bg') };
+const statusLine = { well: C('--green'), watch: C('--amber'), alert: C('--coral') };
+
+/* ── Charts ─────────────────────────────────────────────────────────────── */
+function sparkline(data, w, h, color, invert) {
+  if (!data.length) return '';
+  if (data.length === 1) return `<svg width="${w}" height="${h}"><circle cx="${w/2}" cy="${h/2}" r="4" fill="${color}"/></svg>`;
+  const lo = Math.min(...data), hi = Math.max(...data), rg = hi - lo || 1;
+  const pts = data.map((d, i) => {
+    const x = i * (w / (data.length - 1));
+    const norm = (d - lo) / rg;
+    const y = h - (invert ? 1 - norm : norm) * (h - 8) - 4;
+    return [x, y];
+  });
+  const path = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  const last = pts[pts.length - 1];
+  return `<svg width="${w}" height="${h}" style="display:block;overflow:visible">
+    <path d="${path} L${w},${h} L0,${h} Z" fill="${color}" opacity=".14"/>
+    <path d="${path}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="3.4" fill="${color}" stroke="${C('--paper')}" stroke-width="2"/>
+  </svg>`;
+}
+
+function lineChart(data, o) {
+  const w = 860, h = 210, padL = 40, padR = 16, padT = 16, padB = 26;
+  const iw = w - padL - padR, ih = h - padT - padB;
+  const lo = o.min, hi = o.max, rg = hi - lo || 1;
+  const yFor = v => padT + ih - ((v - lo) / rg) * ih;
+  const xFor = i => data.length === 1 ? padL + iw / 2 : padL + i * (iw / (data.length - 1));
+  const ticks = o.ticks || 5;
+
+  let grid = '', ylab = '';
+  for (let t = 0; t < ticks; t++) {
+    const v = lo + (rg * t) / (ticks - 1);
+    const y = yFor(v);
+    grid += `<line x1="${padL}" x2="${w - padR}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${C('--line')}" stroke-dasharray="2 5"/>`;
+    ylab += `<text x="${padL - 9}" y="${(y + 4).toFixed(1)}" text-anchor="end" font-size="10.5" fill="${C('--muted-2')}" font-family="${C('--sans')}">${Number(v.toFixed(o.dec || 0))}</text>`;
+  }
+
+  let band = '';
+  if (o.band) {
+    const y1 = yFor(Math.min(o.band[1], hi)), y2 = yFor(Math.max(o.band[0], lo));
+    band = `<rect x="${padL}" y="${y1.toFixed(1)}" width="${iw}" height="${Math.max(0, y2 - y1).toFixed(1)}" fill="${C('--sage-bg')}" opacity=".55"/>
+      <text x="${w - padR - 4}" y="${(y1 + 13).toFixed(1)}" text-anchor="end" font-size="10" fill="${C('--sage')}" font-family="${C('--sans')}" font-weight="600">${esc(o.bandLabel || 'Target range')}</text>`;
+  }
+
+  const pts = data.map((d, i) => [xFor(i), yFor(d)]);
+  const path = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  const area = `${path} L${pts[pts.length-1][0].toFixed(1)},${padT + ih} L${pts[0][0].toFixed(1)},${padT + ih} Z`;
+  const dots = pts.map((p, i) => {
+    const isLast = i === pts.length - 1;
+    return `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${isLast ? 5 : 3.2}" fill="${o.color}" stroke="${C('--paper')}" stroke-width="2"><title>Day ${i + 1}: ${data[i]}${o.unit || ''}</title></circle>`;
+  }).join('');
+
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;min-width:420px;height:auto;display:block">
+    ${band}${grid}
+    ${o.band ? '' : `<path d="${area}" fill="${o.color}" opacity=".12"/>`}
+    <path d="${path}" fill="none" stroke="${o.color}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    ${dots}${ylab}
+  </svg>`;
+}
+
+function barChart(data, o) {
+  const w = 860, h = 190, padL = 40, padR = 16, padT = 14, padB = 26;
+  const iw = w - padL - padR, ih = h - padT - padB;
+  const gap = 5, bw = Math.max(4, iw / data.length - gap);
+  let bars = '', ylab = '';
+  for (let t = 0; t < 5; t++) {
+    const v = (o.max * t) / 4, y = padT + ih - (v / o.max) * ih;
+    ylab += `<line x1="${padL}" x2="${w - padR}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${C('--line')}" stroke-dasharray="2 5"/>
+      <text x="${padL - 9}" y="${(y + 4).toFixed(1)}" text-anchor="end" font-size="10.5" fill="${C('--muted-2')}" font-family="${C('--sans')}">${Number(v.toFixed(0))}</text>`;
+  }
+  data.forEach((d, i) => {
+    const bh = Math.max(3, (d / o.max) * ih);
+    const x = padL + i * (iw / data.length) + gap / 2;
+    const y = padT + ih - bh;
+    bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="3" fill="${o.colorFor(d)}" opacity="${i === data.length - 1 ? 1 : .62}"><title>Day ${i + 1}: ${d}/5 — ${MOOD_LABEL[d]}</title></rect>`;
+  });
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;min-width:420px;height:auto;display:block">${ylab}${bars}</svg>`;
+}
+
+/* ── State ──────────────────────────────────────────────────────────────── */
+let view = 'roster', activeId = null, filter = 'all', query = '', sortBy = 'acuity';
+const openBoxes = new Set();
+const ACUITY = { alert: 0, watch: 1, well: 2 };
+
+/* ── Roster ─────────────────────────────────────────────────────────────── */
+function renderRoster() {
+  const total = PATIENTS.length;
+  const nAlert = PATIENTS.filter(p => p.status === 'alert').length;
+  const nWatch = PATIENTS.filter(p => p.status === 'watch').length;
+  const nWell  = PATIENTS.filter(p => p.status === 'well').length;
+  const nMissed = PATIENTS.filter(p => p.missedCallDays.includes(p.days - 1)).length;
+
+  const stats = [
+    ['all','Caseload', total, 'Active post-op patients',''],
+    ['alert','Needs review', nAlert, 'Threshold breached','acc-coral'],
+    ['watch','Monitor', nWatch, 'One or more metrics off target','acc-amber'],
+    ['well','Stable', nWell, 'All metrics within target','acc-green'],
+    ['missed','Unreachable', nMissed, 'No answer on today’s call','acc-coral']
+  ].map(([k,label,val,desc,acc]) =>
+    `<button class="stat ${acc} ${filter===k?'on':''}" data-filter="${k}">
+       <div class="sl">${label}</div><div class="sv">${val}</div><div class="sd">${desc}</div>
+     </button>`).join('');
+
+  let list = PATIENTS.slice();
+  if (filter === 'missed') list = list.filter(p => p.missedCallDays.includes(p.days - 1));
+  else if (filter !== 'all') list = list.filter(p => p.status === filter);
+  if (query) {
+    const q = query.toLowerCase();
+    list = list.filter(p => (p.name + ' ' + p.procedure + ' ' + p.surgeon).toLowerCase().includes(q));
+  }
+  list.sort((a, b) => {
+    if (sortBy === 'acuity') return ACUITY[a.status] - ACUITY[b.status] || a.pod - b.pod;
+    if (sortBy === 'name') return a.last.localeCompare(b.last);
+    if (sortBy === 'pod') return a.pod - b.pod;
+    if (sortBy === 'pain') return (b.lastPain ?? -1) - (a.lastPain ?? -1);
+    if (sortBy === 'adherence') return a.adhPct - b.adhPct;
+    return 0;
+  });
+
+  const rows = list.map(p => {
+    const missedToday = p.missedCallDays.includes(p.days - 1);
+    const cells = p.trend.map((s, i) => {
+      const miss = p.missedCallDays.includes(i);
+      return `<i style="background:${miss ? 'transparent' : statusLine[s]};opacity:${miss ? 1 : .82};box-shadow:inset 0 0 0 ${miss ? '1.5px ' + C('--coral') : '0 transparent'}" title="Day ${i+1} of ${p.days}: ${miss ? 'No answer' : STATUS_LABEL[s]}"></i>`;
+    }).join('');
+    const painCls = p.lastPain == null ? '' : p.lastPain >= 7 ? 'bad' : p.lastPain >= 5 ? 'warn' : '';
+    const sleepCls = p.lastSleep == null ? '' : p.lastSleep < 5 ? 'bad' : p.lastSleep < 6 ? 'warn' : '';
+    const adhCls = p.adhPct < 85 ? 'bad' : p.adhPct < 95 ? 'warn' : '';
+    const moodCls = p.lastMood == null ? '' : p.lastMood <= 2 ? 'bad' : p.lastMood === 3 ? 'warn' : '';
+    const dash = '<small>—</small>';
+
+    return `<button class="prow s-${p.status}" data-open="${p.id}">
+      <div class="pid">
+        <div class="avatar">${p.initials}</div>
+        <div style="min-width:0">
+          <div class="pname">${esc(p.name)}</div>
+          <div class="pmeta">${p.age} · ${esc(p.procedure)} · POD ${p.pod}</div>
+        </div>
+      </div>
+      <div class="pstatus">
+        <span class="chip ${p.status}"><span class="dot ${p.status}"></span>${STATUS_LABEL[p.status]}</span>
+        <span class="lastcall ${missedToday ? 'stale' : ''}">${missedToday ? 'No answer today' : 'Last call ' + esc(p.calls[0][1])}</span>
+      </div>
+      <div class="pmetrics">
+        <div class="pm"><div class="k">Pain</div><div class="v ${painCls}">${p.lastPain == null ? dash : p.lastPain + '<small>/10</small>'}</div></div>
+        <div class="pm"><div class="k">Sleep</div><div class="v ${sleepCls}">${p.lastSleep == null ? dash : p.lastSleep + '<small>h</small>'}</div></div>
+        <div class="pm"><div class="k">Meds</div><div class="v ${adhCls}">${p.adhPct}<small>%</small></div></div>
+        <div class="pm"><div class="k">Mood</div><div class="v ${moodCls}">${p.lastMood == null ? dash : p.lastMood + '<small>/5</small>'}</div></div>
+        <div class="pm"><div class="k">Indep.</div><div class="v ${p.indep <= 2 ? 'bad' : p.indep <= 4 ? 'warn' : ''}">${p.indep}<small>/6</small></div></div>
+      </div>
+      <div class="pright">
+        <div class="minigrid" title="Daily status, last ${p.days} days">${cells}</div>
+        <span class="chev">${chev('right')}</span>
+      </div>
+      ${p.flags.length ? `<div class="flagline">${p.flags.map(f => `<span class="ftag ${f[0]}">${esc(f[1])}</span>`).join('')}</div>` : ''}
+    </button>`;
+  }).join('');
+
+  return `
+    <div class="eyebrow">Caseload · ${new Date().toLocaleDateString('en-CA',{weekday:'long', month:'long', day:'numeric'})}</div>
+    <h1 class="page-title">Good morning, Sarah.</h1>
+    <p class="page-sub">Every figure below is a direct measure — what the patient reported on the call, or a count we hold (doses confirmed, calls answered, tasks done unaided). Nothing here is a derived score.</p>
+
+    <div class="stat-strip">${stats}</div>
+
+    <div class="toolbar">
+      <div class="search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="search" id="q" placeholder="Search name, procedure, surgeon…" value="${esc(query)}" />
+      </div>
+      <select class="sortsel" id="sort">
+        <option value="acuity"${sortBy==='acuity'?' selected':''}>Sort: acuity first</option>
+        <option value="pain"${sortBy==='pain'?' selected':''}>Sort: highest pain</option>
+        <option value="adherence"${sortBy==='adherence'?' selected':''}>Sort: lowest adherence</option>
+        <option value="pod"${sortBy==='pod'?' selected':''}>Sort: earliest post-op day</option>
+        <option value="name"${sortBy==='name'?' selected':''}>Sort: surname</option>
+      </select>
+      <span class="count">${list.length} of ${total} patients</span>
+    </div>
+
+    <div class="roster">${rows || '<div class="empty">No patients match this filter.</div>'}</div>`;
+}
+
+/* ── Metric box builder ─────────────────────────────────────────────────── */
+function metricBox(key, opts) {
+  const open = openBoxes.has(key);
+  return `<div class="mbox ${open ? 'open' : ''}" data-box="${key}">
+    <button class="mtop" data-toggle="${key}">
+      <div class="mlabel">${ic(opts.icon)} ${esc(opts.label)}</div>
+      <div class="mval">
+        <div class="mnum ${opts.tone || ''}">${opts.value}</div>
+        <div class="mspark">${opts.spark || ''}</div>
+      </div>
+      <div class="mfoot">
+        <span class="mdelta ${opts.deltaTone || ''}">${opts.delta || ''}</span>
+        <span class="mtoggle">${open ? 'Hide trend' : 'View trend'} ${chev('down')}</span>
+      </div>
+    </button>
+    <div class="mbody" style="max-height:${open ? '1400px' : '0'}">
+      <div class="mbody-in">${opts.body}</div>
+    </div>
+  </div>`;
+}
+
+function axis(days) {
+  const first = days - 1, mid = Math.round(first / 2);
+  return `<div class="xaxis"><span>${first} day${first===1?'':'s'} ago</span><span>${mid ? mid + ' day' + (mid===1?'':'s') + ' ago' : ''}</span><span>Today</span></div>`;
+}
+
+/* ── Detail ─────────────────────────────────────────────────────────────── */
+function renderDetail(p) {
+  const n = p.days;
+  const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
+  const d = (cur, prev) => {
+    if (prev == null || cur == null) return 'Not enough history yet';
+    const diff = Number((cur - prev).toFixed(1));
+    if (diff === 0) return 'No change vs 7 days ago';
+    const arrow = diff > 0 ? '&#9650;' : '&#9660;';
+    return `<span style="font-size:10px">${arrow}</span> ${Math.abs(diff)} vs 7 days ago`;
+  };
+  const tone = (cur, prev, better) => {
+    if (prev == null || cur == null || cur === prev) return '';
+    const good = better === 'down' ? cur < prev : cur > prev;
+    return good ? 'up' : 'down';
+  };
+  const wk = a => a.length > 7 ? a[a.length - 8] : null;
+
+  /* Pain */
+  const painBody = `
+    <div class="chartwrap">${lineChart(p.pain, {min:0, max:10, color:C('--forest'), unit:'/10', band:[0,3], bandLabel:'Target ≤ 3', ticks:6})}</div>
+    ${axis(n)}
+    <div class="statrow">
+      <div class="ministat"><div class="k">Today</div><div class="v">${p.lastPain}/10</div></div>
+      <div class="ministat"><div class="k">7-day mean</div><div class="v">${avg(p.pain.slice(-7)).toFixed(1)}</div></div>
+      <div class="ministat"><div class="k">Highest</div><div class="v">${Math.max(...p.pain)}/10</div></div>
+      <div class="ministat"><div class="k">Days ≥ 5</div><div class="v">${p.pain.filter(v => v >= 5).length}</div></div>
+    </div>
+    <div class="mref"><span class="lbl">Measure</span>Numeric Rating Scale, 0–10, self-reported at the start of each call. Escalation threshold is <b>≥ 7</b>, or any increase of <b>3 points</b> over a 48-hour window. No interpolation is applied on missed calls.</div>`;
+
+  /* Sleep */
+  const sleepBody = `
+    <div class="chartwrap">${lineChart(p.sleep, {min:3, max:10, color:C('--sage'), unit:' h', band:[7,9], bandLabel:'Target 7–9 h', ticks:8})}</div>
+    ${axis(n)}
+    <div class="statrow">
+      <div class="ministat"><div class="k">Last night</div><div class="v">${p.lastSleep} h</div></div>
+      <div class="ministat"><div class="k">7-night mean</div><div class="v">${avg(p.sleep.slice(-7)).toFixed(1)} h</div></div>
+      <div class="ministat"><div class="k">Shortest</div><div class="v">${Math.min(...p.sleep)} h</div></div>
+      <div class="ministat"><div class="k">Nights &lt; 5 h</div><div class="v">${p.sleep.filter(v => v < 5).length}</div></div>
+    </div>
+    <div class="mref"><span class="lbl">Measure</span>Total sleep time in hours, self-reported for the preceding night. Flagged when a single night falls <b>below 5 hours</b>, or the 3-night mean falls below 5. Sleep quality and awakenings are recorded in the call note but not scored.</div>`;
+
+  /* Mood */
+  const moodBody = `
+    <div class="chartwrap">${barChart(p.mood, {max:5, colorFor: v => v <= 2 ? C('--coral') : v === 3 ? C('--amber') : v === 4 ? C('--sage') : C('--green')})}</div>
+    ${axis(n)}
+    <div class="statrow">
+      <div class="ministat"><div class="k">Today</div><div class="v">${MOOD_LABEL[p.lastMood]}</div></div>
+      <div class="ministat"><div class="k">7-day mean</div><div class="v">${avg(p.mood.slice(-7)).toFixed(1)}/5</div></div>
+      <div class="ministat"><div class="k">Lowest</div><div class="v">${MOOD_LABEL[Math.min(...p.mood)]}</div></div>
+      <div class="ministat"><div class="k">Days ≤ 2</div><div class="v">${p.mood.filter(v => v <= 2).length}</div></div>
+    </div>
+    <div class="mref"><span class="lbl">Measure</span>Five-point affect rating assigned from call audio and content: 1 Down · 2 Low · 3 Quiet · 4 Okay · 5 Bright. This is an <b>observational rating, not a validated instrument</b> — treat it as a prompt to look closer, not a diagnosis. PHQ-9 and GAD-7 screening are planned for a later release.</div>`;
+
+  /* Medication adherence */
+  const medRows = p.meds.map(m => {
+    const pct = Math.round(m.taken / m.total * 100);
+    const col = pct === 100 ? C('--green') : pct >= 90 ? C('--sage') : pct >= 75 ? C('--amber') : C('--coral');
+    return `<div class="medrow">
+      <div class="medname">${esc(m.n)}<span>${esc(m.d)} · ${esc(m.p)}</span></div>
+      <div class="track"><div class="fill" style="width:${pct}%;background:${col}"></div></div>
+      <div class="medpct" style="color:${col}">${pct}%</div>
+    </div>`;
+  }).join('');
+  const medBody = `
+    <div style="margin-top:8px">${medRows}</div>
+    <div class="statrow">
+      <div class="ministat"><div class="k">Doses confirmed</div><div class="v">${p.doses.taken}</div></div>
+      <div class="ministat"><div class="k">Doses scheduled</div><div class="v">${p.doses.total}</div></div>
+      <div class="ministat"><div class="k">Missed</div><div class="v" style="color:${p.doses.total - p.doses.taken ? C('--coral') : C('--green')}">${p.doses.total - p.doses.taken}</div></div>
+      <div class="ministat"><div class="k">Days with a miss</div><div class="v">${p.missedDoseDays.length}</div></div>
+    </div>
+    <div class="mref"><span class="lbl">Measure</span>Confirmed doses ÷ scheduled doses over the last ${n} days. Brigid names each medication individually on the call and records a yes or no. <b>PRN medications count only when the patient reports taking one.</b> A dose is counted as missed when the patient states they did not take it — an unanswered call leaves the dose unconfirmed, not missed.</div>`;
+
+  /* Function */
+  const funcBody = `
+    <div class="taskgrid" style="margin-top:14px">
+      ${p.tasks.map(t => `<div class="task">
+        <span class="dot ${t[1] === 'ind' ? 'well' : 'watch'}"></span>
+        <div><div class="tn">${esc(t[0])}</div><div class="td">${esc(t[2])}</div></div>
+        <span class="tbadge ${t[1] === 'ind' ? 'ind' : 'help'}">${t[1] === 'ind' ? 'Unaided' : 'Assisted'}</span>
+      </div>`).join('')}
+    </div>
+    <div class="mref"><span class="lbl">Measure</span>Six activities of daily living, asked conversationally each call and recorded as <b>unaided</b> or <b>assisted</b>. Assistive devices — walker, cane, shower seat — still count as unaided; the distinction is whether another person was required. Barthel Index scoring is planned for a later release.</div>`;
+
+  /* Call adherence */
+  const callBody = `
+    <div class="statrow" style="margin-top:14px">
+      <div class="ministat"><div class="k">Answered</div><div class="v">${p.answered}</div></div>
+      <div class="ministat"><div class="k">Scheduled</div><div class="v">${n}</div></div>
+      <div class="ministat"><div class="k">Missed</div><div class="v" style="color:${p.missedCallDays.length ? C('--coral') : C('--green')}">${p.missedCallDays.length}</div></div>
+      <div class="ministat"><div class="k">Mean duration</div><div class="v">${(() => {
+        const ds = p.calls.filter(c => c[2] !== '—').map(c => { const [m, s] = c[2].split(':').map(Number); return m * 60 + s; });
+        if (!ds.length) return '—';
+        const a = avg(ds); return Math.floor(a / 60) + ':' + String(Math.round(a % 60)).padStart(2, '0');
+      })()}</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(${n},1fr);gap:4px;margin-top:18px">
+      ${p.trend.map((s, i) => `<div style="aspect-ratio:1;border-radius:4px;background:${p.missedCallDays.includes(i) ? 'transparent' : statusFill[s]};box-shadow:inset 0 0 0 ${p.missedCallDays.includes(i) ? '1.5px ' + C('--coral') : '1px ' + statusLine[s] + '40'}" title="Day ${i+1}: ${p.missedCallDays.includes(i) ? 'No answer' : STATUS_LABEL[s]}"></div>`).join('')}
+    </div>
+    ${axis(n)}
+    <div class="mref"><span class="lbl">Measure</span>Calls answered ÷ calls placed. Brigid attempts one call per day at the patient's preferred time, retries twice at 30-minute intervals, then leaves a voicemail. <b>Two consecutive missed calls</b> notify the emergency contact and place the patient in this queue. Hollow squares above are unanswered days.</div>`;
+
+  const boxes = [
+    metricBox(p.id + '-pain', {
+      label:'Pain', icon:'pain',
+      value: p.lastPain == null ? '—' : p.lastPain + '<small>/10</small>',
+      tone: p.lastPain == null ? '' : p.lastPain >= 7 ? 'bad' : p.lastPain >= 5 ? 'warn' : 'good',
+      spark: sparkline(p.pain, 96, 34, p.lastPain >= 5 ? C('--coral') : C('--forest')),
+      delta: d(p.lastPain, wk(p.pain), 'down'), deltaTone: tone(p.lastPain, wk(p.pain), 'down'),
+      body: painBody }),
+    metricBox(p.id + '-sleep', {
+      label:'Sleep', icon:'sleep',
+      value: p.lastSleep == null ? '—' : p.lastSleep + '<small> h</small>',
+      tone: p.lastSleep == null ? '' : p.lastSleep < 5 ? 'bad' : p.lastSleep < 6 ? 'warn' : 'good',
+      spark: sparkline(p.sleep, 96, 34, C('--sage')),
+      delta: d(p.lastSleep, wk(p.sleep), 'up'), deltaTone: tone(p.lastSleep, wk(p.sleep), 'up'),
+      body: sleepBody }),
+    metricBox(p.id + '-mood', {
+      label:'Mood rating', icon:'mood',
+      value: p.lastMood == null ? '—' : MOOD_LABEL[p.lastMood],
+      tone: p.lastMood == null ? '' : p.lastMood <= 2 ? 'bad' : p.lastMood === 3 ? 'warn' : 'good',
+      spark: sparkline(p.mood, 96, 34, C('--amber')),
+      delta: d(p.lastMood, wk(p.mood), 'up'), deltaTone: tone(p.lastMood, wk(p.mood), 'up'),
+      body: moodBody }),
+    metricBox(p.id + '-meds', {
+      label:'Medication adherence', icon:'pill',
+      value: p.adhPct + '<small>%</small>',
+      tone: p.adhPct < 85 ? 'bad' : p.adhPct < 95 ? 'warn' : 'good',
+      spark: '',
+      delta: `${p.doses.taken} of ${p.doses.total} doses confirmed`,
+      deltaTone: p.doses.taken === p.doses.total ? 'up' : p.adhPct < 85 ? 'down' : '',
+      body: medBody }),
+    metricBox(p.id + '-func', {
+      label:'Daily activities', icon:'walk',
+      value: p.indep + '<small>/6 unaided</small>',
+      tone: p.indep <= 2 ? 'bad' : p.indep <= 4 ? 'warn' : 'good',
+      spark: '',
+      delta: `${6 - p.indep} task${6 - p.indep === 1 ? '' : 's'} need another person`,
+      body: funcBody }),
+    metricBox(p.id + '-calls', {
+      label:'Call adherence', icon:'phone',
+      value: p.answered + '<small>/' + n + '</small>',
+      tone: p.missedCallDays.length >= 2 ? 'bad' : p.missedCallDays.length ? 'warn' : 'good',
+      spark: '',
+      delta: p.missedCallDays.length ? `${p.missedCallDays.length} call${p.missedCallDays.length>1?'s':''} unanswered` : 'Every call answered',
+      deltaTone: p.missedCallDays.length ? 'down' : 'up',
+      body: callBody })
+  ].join('');
+
+  const callLog = p.calls.map(c => {
+    const [day, time, dur, st, title, snip, pain, sleep, mood, meds] = c;
+    const missed = st === 'missed';
+    return `<div class="call ${missed ? 'missed' : ''}">
+      <div class="when"><div class="d">${esc(day)}</div><div class="t">${esc(time)}</div></div>
+      <div>
+        <div class="ttl">${missed ? '<span class="dot alert"></span>' : `<span class="dot ${st}"></span>`}${esc(title)}</div>
+        <div class="snip">${esc(snip)}</div>
+        ${missed ? '' : `<div class="vals"><span>Pain ${pain}/10</span><span>Sleep ${sleep} h</span><span>Mood ${MOOD_LABEL[mood]}</span><span>Meds: ${esc(meds)}</span></div>`}
+      </div>
+      <div class="dur">${dur === '—' ? 'No answer' : dur + ' min'}</div>
+    </div>`;
+  }).join('');
+
+  const hot = p.flags.filter(f => f[0] === 'hot');
+  const warm = p.flags.filter(f => f[0] !== 'hot');
+  const barLevel = hot.length ? 'alert' : 'watch';
+  const alertBar = p.flags.length ? `<div class="alertbar ${barLevel}">
+    <div style="flex:1">
+      <h4>${hot.length ? 'Requires nurse review' : 'Worth monitoring'}</h4>
+      <ul>${[...hot, ...warm].map(f => `<li>${esc(f[1])}</li>`).join('')}</ul>
+    </div>
+  </div>` : '';
+
+  return `
+    <button class="back" data-back><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>All patients</button>
+
+    <div class="dhead">
+      <div class="who">
+        <div class="avatar">${p.initials}</div>
+        <div>
+          <h2>${esc(p.name)}</h2>
+          <div class="sub">${p.age} years · ${esc(p.procedure)} · Surgery ${esc(p.surgery)} · ${esc(p.surgeon)}</div>
+        </div>
+      </div>
+      <div class="dactions">
+        <span class="chip ${p.status}"><span class="dot ${p.status}"></span>${STATUS_LABEL[p.status]}</span>
+        <button class="btn">${ic('phone')} Call patient</button>
+      </div>
+      <div class="dfacts">
+        <div class="dfact"><div class="k">Post-op day</div><div class="v">${p.pod}</div></div>
+        <div class="dfact"><div class="k">Days monitored</div><div class="v">${n}</div></div>
+        <div class="dfact"><div class="k">Phone</div><div class="v" style="font-size:16px">${esc(p.phone)}</div></div>
+        <div class="dfact"><div class="k">Last contact</div><div class="v" style="font-size:16px;${p.lastContact ? '' : 'color:' + C('--coral')}">${p.lastContact ? 'Today ' + esc(p.lastContact) : 'No answer today'}</div></div>
+      </div>
+    </div>
+
+    ${alertBar}
+
+    <div class="sechead">
+      <h3>Measures</h3>
+      <span class="note">Each box shows today's figure. Open one for the ${n}-day trend and how it is measured.</span>
+    </div>
+    <div class="mgrid">${boxes}</div>
+
+    <div class="sechead">
+      <h3>Call log</h3>
+      <span class="note">Most recent ${p.calls.length} calls</span>
+    </div>
+    <div class="calls">${callLog}</div>`;
+}
+
+/* ── Render + events ────────────────────────────────────────────────────── */
+function render() {
+  const app = document.getElementById('app');
+  app.innerHTML = view === 'roster' ? renderRoster() : renderDetail(PATIENTS.find(p => p.id === activeId));
+  if (view === 'roster') {
+    const q = document.getElementById('q');
+    if (q) {
+      q.addEventListener('input', e => {
+        query = e.target.value;
+        const pos = e.target.selectionStart;
+        render();
+        const nq = document.getElementById('q');
+        nq.focus(); nq.setSelectionRange(pos, pos);
+      });
+    }
+    const s = document.getElementById('sort');
+    if (s) s.addEventListener('change', e => { sortBy = e.target.value; render(); });
+  }
+  window.scrollTo({ top: 0, behavior: view === 'roster' ? 'auto' : 'auto' });
+}
+
+document.getElementById('app').addEventListener('click', e => {
+  const stat = e.target.closest('[data-filter]');
+  if (stat) { filter = filter === stat.dataset.filter ? 'all' : stat.dataset.filter; return render(); }
+
+  const row = e.target.closest('[data-open]');
+  if (row) { activeId = row.dataset.open; view = 'detail'; openBoxes.clear(); return render(); }
+
+  if (e.target.closest('[data-back]')) { view = 'roster'; activeId = null; return render(); }
+
+  const tog = e.target.closest('[data-toggle]');
+  if (tog) {
+    const key = tog.dataset.toggle;
+    const box = document.querySelector(`[data-box="${key}"]`);
+    const body = box.querySelector('.mbody');
+    const label = box.querySelector('.mtoggle');
+    if (openBoxes.has(key)) {
+      openBoxes.delete(key);
+      box.classList.remove('open');
+      body.style.maxHeight = '0';
+      label.childNodes[0].nodeValue = 'View trend ';
+    } else {
+      openBoxes.add(key);
+      box.classList.add('open');
+      body.style.maxHeight = body.firstElementChild.scrollHeight + 40 + 'px';
+      label.childNodes[0].nodeValue = 'Hide trend ';
+    }
+  }
+});
+
+document.getElementById('nav-date').textContent =
+  new Date().toLocaleDateString('en-CA', { weekday: 'short', month: 'short', day: 'numeric' });
+
+render();
+</script>
+</body>
+</html>
